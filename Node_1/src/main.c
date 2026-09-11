@@ -20,7 +20,7 @@ int main(void) {
     // 2. Link standard I/O (printf) to our UART transmission wrapper
     fdevopen(UART_Transmit_printf, NULL);
     
-    // 3. Enable global interrupts (Crucial! The Receive ISR will not fire without this)
+    // 3. Enable global interrupts
     sei();
     
     // 4. Print startup messages
@@ -31,15 +31,11 @@ int main(void) {
     
     // 5. Main application loop
     while (1) {
-        // Print a periodic message to the terminal
+        
         printf("System is running... Send me a character!\n");
         
-        // Delay for 5000 milliseconds (5 seconds)
         _delay_ms(5000);
         
-        // Note: Even while trapped in this delay, if a character arrives 
-        // via serial, the ATmega162 will pause the delay, jump to the ISR 
-        // in uart.c, process the character, and return right back here!
     }
     
     return 0;
