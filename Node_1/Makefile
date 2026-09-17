@@ -1,4 +1,4 @@
-SOURCE_FILES := TestScripts/latchTest.c Drivers/UART.c
+SOURCE_FILES := src/main.c Drivers/UART.c Drivers/XMEM.c Drivers/ADC.c
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes

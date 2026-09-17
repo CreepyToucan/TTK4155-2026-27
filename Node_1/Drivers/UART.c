@@ -17,9 +17,11 @@ void UART_Init(unsigned int ubrr) {
     // 3. Set frame format: 8 data bits, 1 stop bit
     // Note: On the ATmega162, URSEL0 must be written to 1 when writing to UCSR0C
     UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
+
+    fdevopen(UART_Transmit_printf, UART_Receive); // Link standard I/O (printf) to our UART transmission wrapper
 }
 
-// Transmit a single character (Handles Situation A via polling)
+// Transmit a single character 
 void UART_Transmit(unsigned char data) {
     // Wait until the transmit buffer is empty
     while (!(UCSR0A & (1 << UDRE0)));
@@ -39,11 +41,9 @@ int UART_Transmit_printf(char data, FILE *stream) {
     return 0; // Return 0 to indicate successful transmission
 }
 
-// Interrupt Service Routine for Receive Complete (Handles Situation B)
-ISR(USART0_RXC_vect) {
-    // Read the received data from the buffer
-    unsigned char received_data = UDR0;
-    
-    // TODO: Handle the received character (e.g., add to a buffer or set a flag)
-    // Example: UART_Transmit(received_data); // Echo it back
+int UART_Receive(){
+	if(!(UCSR0A & (1<<RXC0))){
+		return 0;
+	}
+	return UDR0;
 }
