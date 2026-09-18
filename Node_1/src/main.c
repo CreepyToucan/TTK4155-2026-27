@@ -19,7 +19,7 @@ int main(void) {
     UART_Init(MYUBRR);
     xmem_init();
     ADC_Init();
-    //SRAM_test();
+    SRAM_test();
     //SRAM_single_test();
 
 
@@ -27,15 +27,13 @@ int main(void) {
 
     while(1) {
 
-        printf("Position: %f\n", GetPos(Joy_y));
-        printf("Direction: %c\n", GetDir(Joy_y));
-
-
+        //printf("Position: %d\n", GetPos(Pad_y));
+        //printf("Direction: %c\n", GetDir(Pad_x));
 
 
 
         
-        _delay_ms(15); 
+        _delay_ms(100); 
     
     }
 

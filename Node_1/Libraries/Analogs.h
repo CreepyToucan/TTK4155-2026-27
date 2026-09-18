@@ -12,25 +12,25 @@ typedef enum {
 } InputType;
 
 // Normalized values for joy_Y readings
-// @return float [-1 ; 0 ; 1]  Down, Middle, Up
-float HandleJOY_Y(void);
+// @return int8_t [-100 ; 0 ; 100]  Down, Middle, Up
+int8_t HandleJOY_Y(void);
 
 // Normalized values for joy_X readings
-// @return float [-1 ; 0 ; 1]  Left, Middle, Right
-float HandleJOY_X(void);
+// @return int8_t [-100 ; 0 ; 100]  Left, Middle, Right
+int8_t HandleJOY_X(void);
 
 // Normalized values for pad_Y readings
-// @return float [0 ; 1]  Down, Up
-float HandlePad_Y(void);
+// @return int8_t [0 ; 100]  Down, Up
+int8_t HandlePad_Y(void);
 
 // Normalized values for pad_X readings
-// @return float [0 ; 1]  Left, Right
-float HandlePad_X(void);
+// @return int8_t [0 ; 100]  Left, Right
+int8_t HandlePad_X(void);
 
 // Get the normalized position for a specific input
 // @param obj The input axis to read
-// @return float Normalized position value
-float GetPos(InputType obj);
+// @return int8_t Normalized position value
+int8_t GetPos(InputType obj);
 
 // Get the current direction for a specific input
 // @param obj The input axis to read
