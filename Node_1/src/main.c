@@ -9,17 +9,34 @@
 #include "UART.h"
 #include "XMEM.h"
 #include "ADC.h"
+#include "Analogs.h"
 
 int main(void) {
+
+
+    ///   SETUP   ///
+
     UART_Init(MYUBRR);
     xmem_init();
     ADC_Init();
     //SRAM_test();
     //SRAM_single_test();
 
+
+    ///   LOOP  ///
+
     while(1) {
-        printf("ADC Value: %d\n", ADC_ReadChannel(0)); 
-        _delay_ms(10); 
+
+        printf("Position: %f\n", GetPos(Joy_y));
+        printf("Direction: %c\n", GetDir(Joy_y));
+
+
+
+
+
+        
+        _delay_ms(15); 
+    
     }
 
     return 0;
