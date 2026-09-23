@@ -22,7 +22,7 @@ void oled_clear_line(uint8_t line);
 void oled_clear(void);
 void oled_print(const char* str);
 void oled_funny_graphics(void);
-
+void oled_clear(void);
 void oled_write_cmd(uint8_t cmd);
 void oled_write_data(uint8_t data);
 

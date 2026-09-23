@@ -41,14 +41,11 @@ int main(void) {
     oled_init(&my_oled);
 
     oled_goto_line(2);
-    oled_goto_column(10);
-    oled_print("CAB");
+    oled_funny_graphics();
 
     ///   LOOP  ///
 
     while(1) {
-    
-    oled_print("CAB");
 
     }
 

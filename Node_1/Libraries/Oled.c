@@ -1,19 +1,13 @@
 #include "Oled.h"
 #include "SPI.h"
+#include "fonts.h"
 #include <avr/io.h>
-#include <util/delay.h>
+
 #define CHAR_WIDTH 6  // 5 pixels of glyph + 1 pixel spacing
+
 
 // Internal copy of the configuration to be used by all functions
 static oled_config_t oled_cfg;
-
-// Minimal 5x8 font array (Space, 'A', 'B', 'C')
-const uint8_t font5x8[][5] = {
-    {0x00, 0x00, 0x00, 0x00, 0x00}, // Space
-    {0x7E, 0x11, 0x11, 0x11, 0x7E}, // A
-    {0x7F, 0x49, 0x49, 0x49, 0x36}, // B
-    {0x3E, 0x41, 0x41, 0x41, 0x22}  // C
-};
 
 void oled_write_cmd(uint8_t cmd) {
     *(oled_cfg.ctrl_port) &= ~(1 << oled_cfg.dc_pin); // Pull D/C# LOW for Command
@@ -85,18 +79,20 @@ void oled_pos(uint8_t line, uint8_t column) {
 
 void oled_print(const char* str) {
     while (*str) {
+
         char c = *str;
-        uint8_t font_index = 0; 
         
-        if (c >= 'A' && c <= 'C') {
-            font_index = c - 'A' + 1;
+        if (c < ' ' || c > '~') {
+            c = ' '; 
         }
 
+        int index = c - ' ';
+
         for (uint8_t i = 0; i < CHAR_WIDTH - 1; i++) {
-            oled_write_data(font5x8[font_index][i]);
+            oled_write_data(pgm_read_byte(&font5[index][i]));
         }
         
-        oled_write_data(0x00); // 1-pixel spacing
+        oled_write_data(0x00);
         str++;
     }
 }
