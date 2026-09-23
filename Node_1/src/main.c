@@ -10,6 +10,21 @@
 #include "XMEM.h"
 #include "ADC.h"
 #include "Analogs.h"
+#include "SPI.h"
+#include "Oled.h"
+
+#define IO_board PB3
+#define Oled PB2
+
+
+oled_config_t my_oled = {
+        .ctrl_port = &PORTD,
+        .ctrl_ddr  = &DDRD,
+        .dc_pin    = PD2,
+        .cs_port   = &PORTB,
+        .cs_pin    = PB1
+    };
+
 
 int main(void) {
 
@@ -19,20 +34,23 @@ int main(void) {
     UART_Init(MYUBRR);
     xmem_init();
     ADC_Init();
-    SRAM_test();
-    //SRAM_single_test();
+    initButton();
+    spi_init();
+    slave_init(IO_board);
+    slave_init(Oled);
+    oled_init(&my_oled);
 
 
     ///   LOOP  ///
 
     while(1) {
 
-        //printf("Position: %d\n", GetPos(Pad_y));
-        //printf("Direction: %c\n", GetDir(Pad_x));
 
+        oled_goto_line(2);
+        oled_goto_column(10);
+        oled_print("CAB");
 
-
-        
+      
         _delay_ms(100); 
     
     }

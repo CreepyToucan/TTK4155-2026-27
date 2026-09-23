@@ -37,7 +37,7 @@ int8_t HandlePad_X(void){
 }
 
 
-int8_t GetPos(InputType obj) {
+int8_t getPos(InputType obj) {
 
     switch(obj) {
         case Joy_y:
@@ -54,7 +54,7 @@ int8_t GetPos(InputType obj) {
 }
 
 
-char GetDir(InputType obj){
+char getDir(InputType obj){
     
     switch(obj){
 
@@ -90,3 +90,20 @@ char GetDir(InputType obj){
             return 'X';
     }
 }
+
+
+void initButton(void){
+    DDRD &= ~(1 << DDD3);
+    PORTD |= (1 << PORTD3);
+}
+
+
+uint8_t getButton(void){
+
+    if (!(PIND & (1 << PIND3))) {
+        return 1; // Button is pressed
+    } else {
+        return 0; // Button is unpressed
+    }
+}
+

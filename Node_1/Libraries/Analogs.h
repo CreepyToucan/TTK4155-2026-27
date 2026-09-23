@@ -30,11 +30,18 @@ int8_t HandlePad_X(void);
 // Get the normalized position for a specific input
 // @param obj The input axis to read
 // @return int8_t Normalized position value
-int8_t GetPos(InputType obj);
+int8_t getPos(InputType obj);
 
 // Get the current direction for a specific input
 // @param obj The input axis to read
 // @return char 'U'(Up), 'D'(Down), 'R'(Right), 'L'(Left), 'N'(Neutral), or 'X'(Error)
-char GetDir(InputType obj);
+char getDir(InputType obj);
+
+//  Initialize Joy button on PD3
+void initButton(void);
+
+// Read value from button 
+// @return uint8_t if pushed 1, 0 otherwise
+uint8_t getButton(void);
 
 #endif // INPUT_HANDLER_H
