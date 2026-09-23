@@ -2,6 +2,7 @@
 #include "SPI.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#define CHAR_WIDTH 6  // 5 pixels of glyph + 1 pixel spacing
 
 // Internal copy of the configuration to be used by all functions
 static oled_config_t oled_cfg;
@@ -28,7 +29,13 @@ void oled_write_data(uint8_t data) {
     spi_select_slave(oled_cfg.cs_port, oled_cfg.cs_pin, 0);
 }
 
-
+void oled_clear_line(uint8_t line) {
+    oled_goto_line(line);
+    oled_goto_column(0);
+    for (uint8_t col = 0; col < 128; col++) {
+        oled_write_data(0x00);
+    }
+}
 
 void oled_clear(void) {
     for (uint8_t page = 0; page < 8; page++) {
@@ -56,12 +63,8 @@ void oled_init(const oled_config_t *config) {
     oled_write_cmd(0xA4); // Entire Display ON (Resume to RAM content)
     oled_write_cmd(0xA6); // Set Normal Display (0 in RAM = OFF, 1 = ON)
     oled_write_cmd(0xAF); // Display ON in normal mode
-
     oled_clear();
-
 }
-
-
 
 void oled_goto_line(uint8_t line) {
     // In Page Addressing Mode, the GDDRAM is divided into 8 pages (0-7)[cite: 2]
@@ -75,6 +78,11 @@ void oled_goto_column(uint8_t column) {
     oled_write_cmd(0x10 | ((column >> 4) & 0x0F)); 
 }
 
+void oled_pos(uint8_t line, uint8_t column) {
+    oled_goto_line(line);
+    oled_goto_column(column * CHAR_WIDTH);
+}
+
 void oled_print(const char* str) {
     while (*str) {
         char c = *str;
@@ -84,7 +92,7 @@ void oled_print(const char* str) {
             font_index = c - 'A' + 1;
         }
 
-        for (uint8_t i = 0; i < 5; i++) {
+        for (uint8_t i = 0; i < CHAR_WIDTH - 1; i++) {
             oled_write_data(font5x8[font_index][i]);
         }
         

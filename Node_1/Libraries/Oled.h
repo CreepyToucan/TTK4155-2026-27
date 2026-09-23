@@ -17,6 +17,9 @@ typedef struct {
 void oled_init(const oled_config_t *config);
 void oled_goto_line(uint8_t line);
 void oled_goto_column(uint8_t column);
+void oled_pos(uint8_t line, uint8_t column);
+void oled_clear_line(uint8_t line);
+void oled_clear(void);
 void oled_print(const char* str);
 void oled_funny_graphics(void);
 
