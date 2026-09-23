@@ -46,6 +46,16 @@ void oled_init(const oled_config_t *config) {
     oled_write_cmd(0xAF); // Display ON in normal mode
 }
 
+void oled_clear(void) {
+    for (uint8_t page = 0; page < 8; page++) {
+        oled_goto_line(page);   // set page address
+        oled_goto_column(0);    // reset column address to 0
+        for (uint8_t col = 0; col < 128; col++) {
+            oled_write_data(0x00);
+        }
+    }
+}
+
 void oled_goto_line(uint8_t line) {
     // In Page Addressing Mode, the GDDRAM is divided into 8 pages (0-7)[cite: 2]
     oled_write_cmd(0xB0 | (line & 0x07)); 
