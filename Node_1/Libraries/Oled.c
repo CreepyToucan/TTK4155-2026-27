@@ -28,11 +28,23 @@ void oled_write_data(uint8_t data) {
     spi_select_slave(oled_cfg.cs_port, oled_cfg.cs_pin, 0);
 }
 
+
+
+void oled_clear(void) {
+    for (uint8_t page = 0; page < 8; page++) {
+        oled_goto_line(page);   // set page address
+        oled_goto_column(0);    // reset column address to 0
+        for (uint8_t col = 0; col < 128; col++) {
+            oled_write_data(0x00);
+        }
+    }
+}
+
 void oled_init(const oled_config_t *config) {
     // Store configuration locally
     oled_cfg = *config;
 
-    // Configure DC and RES pins as outputs
+    // Configure DC pin as output
     *(oled_cfg.ctrl_ddr) |= (1 << oled_cfg.dc_pin);
 
     // SSD1309 Initialization Sequence
@@ -44,17 +56,12 @@ void oled_init(const oled_config_t *config) {
     oled_write_cmd(0xA4); // Entire Display ON (Resume to RAM content)
     oled_write_cmd(0xA6); // Set Normal Display (0 in RAM = OFF, 1 = ON)
     oled_write_cmd(0xAF); // Display ON in normal mode
+
+    oled_clear();
+
 }
 
-void oled_clear(void) {
-    for (uint8_t page = 0; page < 8; page++) {
-        oled_goto_line(page);   // set page address
-        oled_goto_column(0);    // reset column address to 0
-        for (uint8_t col = 0; col < 128; col++) {
-            oled_write_data(0x00);
-        }
-    }
-}
+
 
 void oled_goto_line(uint8_t line) {
     // In Page Addressing Mode, the GDDRAM is divided into 8 pages (0-7)[cite: 2]

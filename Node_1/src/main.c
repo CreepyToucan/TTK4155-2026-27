@@ -14,7 +14,7 @@
 #include "Oled.h"
 
 #define IO_board PB3
-#define Oled PB2
+#define Oled PB2    //slave cs pin
 
 
 oled_config_t my_oled = {
@@ -22,7 +22,7 @@ oled_config_t my_oled = {
         .ctrl_ddr  = &DDRD,
         .dc_pin    = PD2,
         .cs_port   = &PORTB,
-        .cs_pin    = PB1
+        .cs_pin    = PB2
     };
 
 
@@ -36,23 +36,20 @@ int main(void) {
     ADC_Init();
     initButton();
     spi_init();
-    slave_init(IO_board);
+    //slave_init(IO_board);
     slave_init(Oled);
     oled_init(&my_oled);
 
+    oled_goto_line(2);
+    oled_goto_column(10);
+    oled_print("CAB");
 
     ///   LOOP  ///
 
     while(1) {
-
-
-        oled_goto_line(2);
-        oled_goto_column(10);
-        oled_print("CAB");
-
-      
-        _delay_ms(100); 
     
+    oled_print("CAB");
+
     }
 
     return 0;
