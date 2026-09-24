@@ -39,13 +39,23 @@ int main(void) {
     //slave_init(IO_board);
     slave_init(Oled);
     oled_init(&my_oled);
-
-    oled_goto_line(2);
-    oled_funny_graphics();
+  
 
     ///   LOOP  ///
 
     while(1) {
+
+
+        char c = getDir(Joy_x);
+        char str_buff[2] = {c,'\0'};
+
+        //printf("val: %c\n",str);
+
+        oled_pos(0,0);  
+        oled_print((char[]){getDir(Joy_x),'\0'});
+        oled_pos(2,0);
+        oled_print((char[]){getDir(Joy_y),'\0'});
+
 
     }
 

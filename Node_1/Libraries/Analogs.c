@@ -7,7 +7,7 @@
 int8_t HandleJOY_Y(void){
     uint8_t raw = ADC_ReadChannel(0);
 
-    int8_t pos = raw-159;
+    int8_t pos = 159-raw;
 
     if(pos < 0)
         return (pos*100/88);
@@ -18,7 +18,7 @@ int8_t HandleJOY_Y(void){
 int8_t HandleJOY_X(void){
     uint8_t raw = ADC_ReadChannel(1);
 
-    int8_t pos = raw-163;
+    int8_t pos = 163-raw;
 
     if(pos < 0)
         return (pos*100/92);
@@ -59,17 +59,17 @@ char getDir(InputType obj){
     switch(obj){
 
         case Joy_y:
-            if(HandleJOY_Y() > 1)
+            if(HandleJOY_Y() > 2)
                 return 'U';
-            else if(HandleJOY_Y() < -1)
+            else if(HandleJOY_Y() < -2)
                 return 'D';
             else
                 return 'N';
 
         case Joy_x:
-            if(HandleJOY_X() > 1)
+            if(HandleJOY_X() > 2)
                 return 'R';
-            else if(HandleJOY_X() < -1)
+            else if(HandleJOY_X() < -2)
                 return 'L';
             else
                 return 'N';
