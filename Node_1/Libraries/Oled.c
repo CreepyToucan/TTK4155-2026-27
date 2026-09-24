@@ -56,6 +56,8 @@ void oled_init(const oled_config_t *config) {
     oled_write_cmd(0x7F); // Default contrast 127
     oled_write_cmd(0xA4); // Entire Display ON (Resume to RAM content)
     oled_write_cmd(0xA6); // Set Normal Display (0 in RAM = OFF, 1 = ON)
+    oled_write_cmd(0xA1); //segment remap
+    oled_write_cmd(0xC8); //scan direction
     oled_write_cmd(0xAF); // Display ON in normal mode
     oled_clear();
 }

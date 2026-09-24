@@ -12,18 +12,26 @@
 #include "Analogs.h"
 #include "SPI.h"
 #include "Oled.h"
+#include "io_board.h"
 
+//slave cs pin
 #define IO_board PB3
-#define Oled PB2    //slave cs pin
-
+#define Oled PB2    
 
 oled_config_t my_oled = {
-        .ctrl_port = &PORTD,
-        .ctrl_ddr  = &DDRD,
-        .dc_pin    = PD2,
-        .cs_port   = &PORTB,
-        .cs_pin    = PB2
-    };
+    .ctrl_port = &PORTD,
+    .ctrl_ddr  = &DDRD,
+    .dc_pin    = PD2,
+    .cs_port   = &PORTB,
+    .cs_pin    = PB2
+};
+
+
+io_board_config_t my_IO = {
+    .cs_port = &PORTB,
+    .cs_pin = IO_board
+};
+
 
 
 int main(void) {
@@ -36,9 +44,11 @@ int main(void) {
     ADC_Init();
     initButton();
     spi_init();
-    //slave_init(IO_board);
     slave_init(Oled);
+    slave_init(IO_board);
     oled_init(&my_oled);
+    io_board_init(&my_IO);
+
   
 
     ///   LOOP  ///
@@ -46,15 +56,12 @@ int main(void) {
     while(1) {
 
 
-        char c = getDir(Joy_x);
-        char str_buff[2] = {c,'\0'};
+       io_buttons_t butt = io_getButtons();
+       printf("%d",butt.left);
 
-        //printf("val: %c\n",str);
-
-        oled_pos(0,0);  
-        oled_print((char[]){getDir(Joy_x),'\0'});
-        oled_pos(2,0);
-        oled_print((char[]){getDir(Joy_y),'\0'});
+       io_info_t info;
+       io_getInfo(&info);
+       printf("IO_avr: %d",info.serial);
 
 
     }
