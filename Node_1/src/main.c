@@ -13,6 +13,7 @@
 #include "SPI.h"
 #include "Oled.h"
 #include "io_board.h"
+#include "menu.h"
 
 //slave cs pin
 #define IO_board PB3
@@ -32,6 +33,14 @@ io_board_config_t my_IO = {
     .cs_pin = IO_board
 };
 
+const menu_item_t main_items[] = {
+    {"New Game"},
+    {"Settings"},
+    {"High Scores"},
+    {"Quit"}
+};
+
+menu_t main_menu = { main_items, 3 };
 
 
 int main(void) {
@@ -49,22 +58,25 @@ int main(void) {
     oled_init(&my_oled);
     io_board_init(&my_IO);
 
-  
 
     ///   LOOP  ///
 
     while(1) {
+        // Main menu
+        uint8_t choice = menu_run(&main_menu);
+        switch (choice) {
+            case 0: start_new_game(); break;
+            case 1: show_settings_menu(); break;
+            case 2: show_high_scores(); break;
+            case 3: break; //todo: quit or shutdown
+        }
 
+        io_buttons_t butt = io_getButtons();
+        printf("%d",butt.left);
 
-       io_buttons_t butt = io_getButtons();
-       printf("%d",butt.left);
-
-       io_info_t info;
-       io_getInfo(&info);
-       printf("IO_avr: %d",info.serial);
-
-
+        io_info_t info;
+        io_getInfo(&info);
+        printf("IO_avr: %d",info.serial);
     }
-
     return 0;
 }
