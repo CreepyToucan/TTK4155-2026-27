@@ -1,6 +1,7 @@
 // menu.c
 #define F_CPU 4915200UL
 
+#include <stdio.h>
 #include <util/delay.h>
 #include "menu.h"
 #include "Oled.h"
@@ -8,26 +9,26 @@
 #include "io_board.h"
 
 
-static void menu_draw(const menu_t* menu, uint8_t selected) {
+static void menu_draw(const menu_t* menu, uint8_t selected, uint8_t font_size) {
     for (uint8_t i = 0; i < menu->item_count; i++) {
-        oled_pos(i, 0);
+        oled_pos(i, 0, font_size);
         if (i == selected) {
-            oled_print(">");   // simple cursor indicator
+            oled_print(">", font_size);   // simple cursor indicator
         } else {
-            oled_print(" ");
+            oled_print(" ", font_size);
         }
-        oled_pos(i, 1);
-        oled_print(menu->items[i].label);
+        oled_pos(i, 1, font_size);
+        oled_print(menu->items[i].label, font_size);
     }
 }
 
-uint8_t menu_run(const menu_t* menu) {
+uint8_t menu_run(const menu_t* menu, uint8_t font_size) {
     _delay_ms(100); // add delay to avoid instantly select from previous button press
     uint8_t selected = 0;
     char last_dir = 'N'; //Neutral
     
     oled_clear();
-    menu_draw(menu, selected);
+    menu_draw(menu, selected, font_size);
 
     while (1) {
         char dir = getDir(Joy_y);
@@ -39,10 +40,10 @@ uint8_t menu_run(const menu_t* menu) {
                     selected = menu->item_count - 1;  // wrap around
                 else
                     selected--;
-                menu_draw(menu, selected);
+                menu_draw(menu, selected, font_size);
             } else if (dir == 'U') {
                 selected = (selected + 1) % menu->item_count;
-                menu_draw(menu, selected);
+                menu_draw(menu, selected, font_size);
             }
             last_dir = dir;
         }
@@ -56,21 +57,6 @@ uint8_t menu_run(const menu_t* menu) {
     }
 }
 
-void show_settings_menu(void) {
-    const menu_item_t settings_items[] = {
-        {"Difficulty"},
-        {"Sound"},
-        {"Back"}
-    };
-    menu_t settings_menu = { settings_items, 3 };
-    uint8_t choice = menu_run(&settings_menu);
-    switch (choice) {
-        case 0: show_dificulty_menu(); break;
-        case 1: show_sound_menu(); break;
-        case 3: break;
-    }
-}
-
 void show_dificulty_menu(void) {
     const menu_item_t difficulty_options[] = {
         {"Easy"},
@@ -78,12 +64,29 @@ void show_dificulty_menu(void) {
         {"Hard"}
     };
     menu_t difficulty_menu = { difficulty_options, 3 };
-    return menu_run(&difficulty_menu);
+    uint8_t choice = menu_run(&difficulty_menu, 4);
+    //todo: set difficulty here somehow
 }
 
 void show_sound_menu(void) {
     //todo
 }
+
+void show_settings_menu(void) {
+    const menu_item_t settings_items[] = {
+        {"Difficulty"},
+        {"Sound"},
+        {"Back"}
+    };
+    menu_t settings_menu = { settings_items, 3 };
+    uint8_t choice = menu_run(&settings_menu, 5);
+    switch (choice) {
+        case 0: show_dificulty_menu(); break;
+        case 1: show_sound_menu(); break;
+        case 3: break;
+    }
+}
+
 
 void show_high_scores(void) {
     //todo

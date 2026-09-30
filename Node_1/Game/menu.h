@@ -12,6 +12,10 @@ typedef struct {
 } menu_t;
 
 // Blocks until the user selects a menu item, then returns the index of that item.
-uint8_t menu_run(const menu_t* menu);
+uint8_t menu_run(const menu_t* menu, uint8_t font_size);
+
+void start_new_game(void);
+void show_settings_menu(void);
+void show_high_scores(void);
 
 #endif

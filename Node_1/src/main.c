@@ -112,12 +112,12 @@ int main(void) {
 
         /*
         // Main menu
-        uint8_t choice = menu_run(&main_menu);
+        uint8_t choice = menu_run(&main_menu, 8);
         switch (choice) {
             case 0: start_new_game(); break;
             case 1: show_settings_menu(); break;
             case 2: show_high_scores(); break;
-            case 3: break; //todo: quit or shutdown
+            case 3: oled_funny_graphics(); _delay_ms(2000); break; //quit
         }
 
         io_buttons_t butt = io_getButtons();

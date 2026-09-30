@@ -3,8 +3,6 @@
 #include "fonts.h"
 #include <avr/io.h>
 
-#define CHAR_WIDTH 6  // 5 pixels of glyph + 1 pixel spacing
-
 
 // Internal copy of the configuration to be used by all functions
 static oled_config_t oled_cfg;
@@ -74,12 +72,40 @@ void oled_goto_column(uint8_t column) {
     oled_write_cmd(0x10 | ((column >> 4) & 0x0F)); 
 }
 
-void oled_pos(uint8_t line, uint8_t column) {
-    oled_goto_line(line);
-    oled_goto_column(column * CHAR_WIDTH);
+uint8_t check_font_size(uint8_t font_size) {
+    switch (font_size) {
+        case 4: return 4;
+        case 8: return 8;
+        default: return 5;
+    }
 }
 
-void oled_print(const char* str) {
+void oled_pos(uint8_t line, uint8_t column, uint8_t font_size) {
+    oled_goto_line(line);
+    oled_goto_column(column * (check_font_size(font_size) + 1));
+}
+
+void oled_absolute_pos(uint8_t line, uint8_t column) {
+    oled_goto_line(line);
+    oled_goto_column(column);
+}
+
+void oled_print(const char* str, uint8_t font_size) {
+
+    const uint8_t *selected_font;
+    uint8_t width = check_font_size(font_size);
+    switch (font_size) {
+        case 4:
+            selected_font = (const uint8_t *)font4;
+            break;
+        case 8:
+            selected_font = (const uint8_t *)font8;
+            break;
+        default:
+            selected_font = (const uint8_t *)font5;
+            break;
+    }
+
     while (*str) {
 
         char c = *str;
@@ -90,8 +116,9 @@ void oled_print(const char* str) {
 
         int index = c - ' ';
 
-        for (uint8_t i = 0; i < CHAR_WIDTH - 1; i++) {
-            oled_write_data(pgm_read_byte(&font5[index][i]));
+        for (uint8_t i = 0; i < width; i++) {
+            oled_write_data(pgm_read_byte(selected_font + (index * width) + i));
+            // oled_write_data(pgm_read_byte(selected_font[index][i]));
         }
         
         oled_write_data(0x00);
