@@ -93,14 +93,14 @@ char getDir(InputType obj){
 
 
 void initButton(void){
-    DDRD &= ~(1 << DDD3);
-    PORTD |= (1 << PORTD3);
+    DDRD &= ~(1 << DDD4);
+    PORTD |= (1 << PORTD4);
 }
 
 
 uint8_t getButton(void){
 
-    if (!(PIND & (1 << PIND3))) {
+    if (!(PIND & (1 << PIND4))) {
         return 1; // Button is pressed
     } else {
         return 0; // Button is unpressed

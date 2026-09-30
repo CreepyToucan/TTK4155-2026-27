@@ -16,7 +16,7 @@
 #include "menu.h"
 
 //slave cs pin
-#define IO_board PB3
+#define IO_board PB1
 #define Oled PB2    
 
 oled_config_t my_oled = {
