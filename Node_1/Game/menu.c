@@ -1,12 +1,15 @@
 // menu.c
+#define F_CPU 4915200UL
+
+#include <util/delay.h>
 #include "menu.h"
-#include "oled.h"
+#include "Oled.h"
 #include "Analogs.h"
 #include "io_board.h"
 
 
 static void menu_draw(const menu_t* menu, uint8_t selected) {
-    oled_clear();
+    //oled_clear();
     for (uint8_t i = 0; i < menu->item_count; i++) {
         oled_pos(i, 0);
         if (i == selected) {
