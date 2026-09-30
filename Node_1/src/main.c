@@ -40,7 +40,7 @@ const menu_item_t main_items[] = {
     {"Quit"}
 };
 
-menu_t main_menu = { main_items, 3 };
+menu_t main_menu = { main_items, 4 };
 
 
 int main(void) {
@@ -62,6 +62,12 @@ int main(void) {
     ///   LOOP  ///
 
     while(1) {
+        // while(1){
+        //     io_buttons_t butt = io_getButtons();
+        //     printf("%d\n",butt.right);
+        //     _delay_ms(20);
+        // }
+
         // Main menu
         uint8_t choice = menu_run(&main_menu);
         switch (choice) {
@@ -70,13 +76,6 @@ int main(void) {
             case 2: show_high_scores(); break;
             case 3: break; //todo: quit or shutdown
         }
-
-        io_buttons_t butt = io_getButtons();
-        printf("%d",butt.left);
-
-        io_info_t info;
-        io_getInfo(&info);
-        printf("IO_avr: %d",info.serial);
     }
     return 0;
 }

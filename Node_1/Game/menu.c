@@ -9,7 +9,6 @@
 
 
 static void menu_draw(const menu_t* menu, uint8_t selected) {
-    //oled_clear();
     for (uint8_t i = 0; i < menu->item_count; i++) {
         oled_pos(i, 0);
         if (i == selected) {
@@ -23,9 +22,11 @@ static void menu_draw(const menu_t* menu, uint8_t selected) {
 }
 
 uint8_t menu_run(const menu_t* menu) {
+    _delay_ms(100); // add delay to avoid instantly select from previous button press
     uint8_t selected = 0;
     char last_dir = 'N'; //Neutral
-
+    
+    oled_clear();
     menu_draw(menu, selected);
 
     while (1) {
@@ -33,24 +34,25 @@ uint8_t menu_run(const menu_t* menu) {
 
         // Only act on the transition INTO a direction, not while holding the joystick
         if (dir != last_dir) {
-            if (dir == 'U') {
+            if (dir == 'D') {
                 if (selected == 0)
                     selected = menu->item_count - 1;  // wrap around
                 else
                     selected--;
                 menu_draw(menu, selected);
-            } else if (dir == 'D') {
+            } else if (dir == 'U') {
                 selected = (selected + 1) % menu->item_count;
                 menu_draw(menu, selected);
             }
             last_dir = dir;
         }
 
-        if (io_getButtons().left) { //todo: check what "io_getButtons().left" returns
+        if (io_getButtons().right == 32) {
+            printf("%d", selected);
             return selected;
         }
 
-        _delay_ms(20); // simple polling rate / crude debounce (delay after an action)
+        _delay_ms(40); // simple polling rate / crude debounce (delay after an action)
     }
 }
 
@@ -61,10 +63,26 @@ void show_settings_menu(void) {
         {"Back"}
     };
     menu_t settings_menu = { settings_items, 3 };
-
     uint8_t choice = menu_run(&settings_menu);
-    if (choice == 2) return; // "Back" selected
-    // handle Difficulty / Sound...
+    switch (choice) {
+        case 0: show_dificulty_menu(); break;
+        case 1: show_sound_menu(); break;
+        case 3: break;
+    }
+}
+
+void show_dificulty_menu(void) {
+    const menu_item_t difficulty_options[] = {
+        {"Easy"},
+        {"Medium"},
+        {"Hard"}
+    };
+    menu_t difficulty_menu = { difficulty_options, 3 };
+    return menu_run(&difficulty_menu);
+}
+
+void show_sound_menu(void) {
+    //todo
 }
 
 void show_high_scores(void) {
