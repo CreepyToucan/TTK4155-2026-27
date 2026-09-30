@@ -1,4 +1,4 @@
-SOURCE_FILES := src/main.c Drivers/UART.c Drivers/XMEM.c Drivers/ADC.c Libraries/Analogs.c Drivers/SPI.c Libraries/Oled.c Libraries/io_board.c Game/menu.c
+SOURCE_FILES := $(wildcard Libraries/*.c) $(wildcard Drivers/*.c) $(wildcard Game/*.c) $(wildcard src/*.c)
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
