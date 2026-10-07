@@ -1,4 +1,4 @@
-#define F_CPU 4915200UL
+#define F_CPU 84000000UL
 #define BAUD 9600
 #define MYUBRR F_CPU/16/BAUD-1
 
@@ -21,13 +21,13 @@ int main()
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
-    //Uncomment after including uart above
-    //uart_init(/*cpufreq*/, /*baud*/);
-    //printf("Hello World\n\r");
+    
+    uart_init(F_CPU, BAUD);
 
     while (1)
     {
-        /* code */
+        printf("Hello World\n\r");
+
     }
     
 }
