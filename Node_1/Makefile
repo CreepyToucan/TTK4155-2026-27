@@ -16,7 +16,7 @@ TARGET_DEVICE := m162
 CC := avr-gcc
 
 # ==========================================
-# NUOVA SEZIONE PER LA GESTIONE DELLE CARTELLE
+# NEW FOLDER STRUCTURE
 # ==========================================
 
 # 1. Ricava la lista delle cartelle dai percorsi dei file sorgente (rimuovendo i duplicati con 'sort')

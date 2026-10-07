@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "MCP2515.h"
 
-// MCP2515 Register Addresses used for CAN operations[cite: 5]
+// MCP2515 Register Addresses used for CAN operations
 #define MCP_TXB0CTRL 0x30
 #define MCP_TXB0SIDH 0x31
 #define MCP_TXB0SIDL 0x32
@@ -30,11 +30,11 @@
 
 /**
  * @brief Available CAN operation modes.
- * Mapped to the REQOP<2:0> bits in the CANCTRL register[cite: 5].
+ * Mapped to the REQOP<2:0> bits in the CANCTRL register.
  */
 typedef enum {
-    CAN_MODE_NORMAL   = 0x00, /**< 000: Normal Operation mode[cite: 5] */
-    CAN_MODE_LOOPBACK = 0x40  /**< 010: Loopback mode (0x40 = 0100 0000 in binary)[cite: 5] */
+    CAN_MODE_NORMAL   = 0x00, /**< 000: Normal Operation mode */
+    CAN_MODE_LOOPBACK = 0x40  /**< 010: Loopback mode (0x40 = 0100 0000 in binary) */
 } can_mode_t;
 
 

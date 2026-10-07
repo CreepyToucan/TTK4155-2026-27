@@ -102,7 +102,6 @@ int main(void) {
             if (CAN_receive(&rx_msg)) {
                 // Verify the received data matches what we sent
                 if (rx_msg.id == 0x123 && rx_msg.data[0] == 0xDE) {
-                    // Toggle an LED to indicate successful transmission and reception
                     printf("Success!\n");
                 }
             }
