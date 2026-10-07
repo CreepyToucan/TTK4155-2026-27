@@ -1,5 +1,22 @@
 #include "CAN.h"
 
+void CAN_init(uint8_t cnf1, uint8_t cnf2, uint8_t cnf3) {
+    // 1. Put the MCP2515 into Configuration Mode to modify CNF registers
+    // REQOP<2:0> = 100 sets Configuration mode
+    mcp2515_bit_modify(MCP_CANCTRL, 0xE0, 0x80);
+
+    // 2. Set the synchronization registers (Baud rate, PropSeg, PhaseSeg1, PhaseSeg2)
+    mcp2515_write(MCP_CNF1, cnf1);
+    mcp2515_write(MCP_CNF2, cnf2);
+    mcp2515_write(MCP_CNF3, cnf3);
+
+    // 3. Put the MCP2515 back into Normal Mode to begin communication
+    // REQOP<2:0> = 000 sets Normal mode
+    mcp2515_bit_modify(MCP_CANCTRL, 0xE0, 0x00);
+}
+
+
+
 uint8_t CAN_transmit(const can_message_t *msg) {
     // Check if TXB0 is currently pending transmission by reading its status
     // Bit 2 of read_status corresponds to TXB0CNTRL.TXREQ

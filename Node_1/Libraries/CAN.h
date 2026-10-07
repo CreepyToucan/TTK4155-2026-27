@@ -5,6 +5,10 @@
 #include "MCP2515.h"
 
 // MCP2515 Register Addresses used for CAN operations
+#define MCP_CNF3    0x28
+#define MCP_CNF2    0x29
+#define MCP_CNF1    0x2A
+
 #define MCP_TXB0CTRL 0x30
 #define MCP_TXB0SIDH 0x31
 #define MCP_TXB0SIDL 0x32
@@ -34,7 +38,9 @@
  */
 typedef enum {
     CAN_MODE_NORMAL   = 0x00, /**< 000: Normal Operation mode */
-    CAN_MODE_LOOPBACK = 0x40  /**< 010: Loopback mode (0x40 = 0100 0000 in binary) */
+    CAN_MODE_LOOPBACK = 0x40, /**< 010: Loopback mode (0x40 = 0100 0000 in binary) */
+    CAN_MODE_CONFIG = 0x80    /**< 100: Configuration mode (0x80 = 1000 0000 in binary) */
+    
 } can_mode_t;
 
 
@@ -46,6 +52,28 @@ typedef struct {
     uint8_t length;    /**< Data Length Code (0-8) */
     uint8_t data[8];   /**< Message payload */
 } can_message_t;
+
+
+/**
+ * @brief Initializes the CAN module synchronization and bit timing parameters. 
+ * Module must be in Configuration mode to modify these registers.
+ * 
+ * This function configures the bit timing logic of the MCP2515 controller. 
+ * The registers can only be modified when the device is in Configuration mode[cite: 46].
+ * The function temporarily transitions the MCP2515 into Configuration mode, 
+ * applies the new settings, and then returns it to Normal mode to allow 
+ * communication on the CAN bus.
+ * 
+ * @param cnf1 Value for the CNF1 register. Configures the Synchronization Jump 
+ *             Width (SJW) length and the Baud Rate Prescaler (BRP)[cite: 47].
+ * @param cnf2 Value for the CNF2 register. Configures the Propagation Segment 
+ *             (PRSEG) length, Phase Segment 1 (PHSEG1) length, and the sample 
+ *             point configuration (SAM)[cite: 47].
+ * @param cnf3 Value for the CNF3 register. Configures the Phase Segment 2 
+ *             (PHSEG2) length[cite: 48].
+ */
+void CAN_init(uint8_t cnf1, uint8_t cnf2, uint8_t cnf3);
+
 
 /**
  * @brief Transmits a CAN message using Transmit Buffer 0 (TXB0).

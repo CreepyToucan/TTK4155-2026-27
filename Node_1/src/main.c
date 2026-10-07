@@ -73,17 +73,18 @@ int main(void) {
 
     // CAN initialization //
     mcp2515_reset();
-    CAN_set_mode(CAN_MODE_LOOPBACK);
+    CAN_set_mode(CAN_MODE_CONFIG);
+    // CNF1 = SWJ:1 BRP:9, CNF2 = BTLMODE:1 SAM:0 PHSEG1:6 PRSEG:1, CNF3 = PHSEG2:5
+    CAN_init(0x09, 0xB1, 0x05); 
+    CAN_set_mode(CAN_MODE_NORMAL);
 
 
     // CAN messages definitio //
     can_message_t tx_msg;
     tx_msg.id = 0x123;         // 11-bit standard ID
-    tx_msg.length = 4;         // 4 bytes of data
+    tx_msg.length = 1;         // 1 byte of data
     tx_msg.data[0] = 0xDE;
-    tx_msg.data[1] = 0xAD;
-    tx_msg.data[2] = 0xBE;
-    tx_msg.data[3] = 0xEF;
+
 
     can_message_t rx_msg;
 
@@ -93,39 +94,10 @@ int main(void) {
 
     while(1) {
 
-        // Send the message
-        if (CAN_transmit(&tx_msg)) {
-            // Give the MCP2515 time to process the loopback
-            _delay_ms(10); 
-            
-            // Check if the message was successfully received back
-            if (CAN_receive(&rx_msg)) {
-                // Verify the received data matches what we sent
-                if (rx_msg.id == 0x123 && rx_msg.data[0] == 0xDE) {
-                    printf("Success!\n");
-                }
-            }
-        }
+        CAN_transmit(&tx_msg); // Transmit the message
         
         _delay_ms(500); // Wait 500ms before testing again
 
-        /*
-        // Main menu
-        uint8_t choice = menu_run(&main_menu, 8);
-        switch (choice) {
-            case 0: start_new_game(); break;
-            case 1: show_settings_menu(); break;
-            case 2: show_high_scores(); break;
-            case 3: oled_funny_graphics(); _delay_ms(2000); break; //quit
-        }
-
-        io_buttons_t butt = io_getButtons();
-        printf("%d",butt.left);
-
-        io_info_t info;
-        io_getInfo(&info);
-        printf("IO_avr: %d",info.serial);
-        */
     }
 
 
