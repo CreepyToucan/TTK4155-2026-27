@@ -67,6 +67,21 @@ void can_init(CanInit init, uint8_t rxInterrupt){
 
     // Enable CAN
     CAN0->CAN_MR |= CAN_MR_CANEN;
+
+    // Create the struct variable using the library's CanInit type
+    CanInit my_can_br;
+
+    // Assign your calculated values for 50 kbps (including the -1 offset)
+    my_can_br.phase2 = 5;
+    my_can_br.propag = 1;
+    my_can_br.phase1 = 6;
+    my_can_br.sjw = 0;
+    my_can_br.brp = 104;
+    my_can_br.smp = 0;
+
+    // Pass the fully populated struct into the library's init function
+    // (Set the second parameter to 1 to enable receive interrupts, or 0 to disable)
+    can_init(my_can_br, 1);
 }
 
 
