@@ -23,6 +23,12 @@
 #define Oled PB2    
 #define CAN_MCP2515 PB3
 
+
+// CAN IDs
+#define JOYX 16
+#define PADX 15
+
+
 oled_config_t my_oled = {
     .ctrl_port = &PORTD,
     .ctrl_ddr  = &DDRD,
@@ -94,9 +100,18 @@ int main(void) {
 
     while(1) {
 
-        CAN_transmit(&tx_msg); // Transmit the message
-        
-        _delay_ms(500); // Wait 500ms before testing again
+
+        tx_msg.id = JOYX; 
+        tx_msg.data[0] = getPos(Joy_x);
+        CAN_transmit(&tx_msg);
+   
+        _delay_ms(10);
+
+        tx_msg.id = PADX; 
+        tx_msg.data[0] = getPos(Pad_x);
+        CAN_transmit(&tx_msg);
+
+        _delay_ms(100); 
 
     }
 

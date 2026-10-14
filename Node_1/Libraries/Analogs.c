@@ -7,7 +7,7 @@
 int8_t HandleJOY_Y(void){
     uint8_t raw = ADC_ReadChannel(0);
 
-    int8_t pos = 159-raw;
+    int8_t pos = raw-159;
 
     if(pos < 0)
         return (pos*100/88);
@@ -18,7 +18,7 @@ int8_t HandleJOY_Y(void){
 int8_t HandleJOY_X(void){
     uint8_t raw = ADC_ReadChannel(1);
 
-    int8_t pos = 163-raw;
+    int8_t pos = raw-163;
 
     if(pos < 0)
         return (pos*100/92);

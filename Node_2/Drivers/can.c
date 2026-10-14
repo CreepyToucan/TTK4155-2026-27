@@ -11,9 +11,8 @@ void can_printmsg(CanMsg m){
     for(uint8_t i = 1; i < m.length; i++){
         printf(", %d", m.byte[i]);
     }
-    printf("})\n");
+    printf("})\r\n"); // Added \r here
 }
-
 
 #define txMailbox 0
 #define rxMailbox 1
