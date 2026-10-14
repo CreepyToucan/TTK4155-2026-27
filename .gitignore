@@ -5,6 +5,8 @@
 *.o
 *.obj
 *.hex
+Node_1/build/*
+Node_2/build/*
 
 # Libraries
 *.a
