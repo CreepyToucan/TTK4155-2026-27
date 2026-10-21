@@ -2,7 +2,6 @@
 #define BAUD 9600
 #define MYUBRR F_CPU/16/BAUD-1
 
-
 #include <stdio.h>
 #include <stdarg.h>
 #include "sam.h"
@@ -24,27 +23,35 @@ for (volatile uint32_t i = 0; i < (ms * 8400); i++);
 
 int main()
 {
-     ///   SETUP   ///
-     SystemInit();
-     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
-     uart_init(F_CPU, BAUD);
-     can_init((CanInit){.brp = 104, .phase1 = 6, .phase2 = 5, .propag = 1 , .sjw = 0, .smp = 0}, 0);
-     
-     pwm_init(&DUE_PIN_21, 50);
-
- 
-
+    ///   SETUP   ///
+    SystemInit();
+    WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
+    uart_init(F_CPU, BAUD);
+    ir_init();
+    // can_init((CanInit){.brp = 104, .phase1 = 6, .phase2 = 5, .propag = 1 , .sjw = 0, .smp = 0}, 0);
+    
+    // pwm_init(&DUE_PIN_21, 50);
 
 
 
-     ///   LOOP   ///
+    uint8_t score = 0;
+
+    ///   LOOP   ///
 
     while (1){
 
         // Move to minimum position: 0.9 ms (900 us)[cite: 1]
-        pwm_set_pulse_us(&DUE_PIN_21, 900);
-        delay_ms(10);
-
+        // pwm_set_pulse_us(&DUE_PIN_21, 900);
+        // delay_ms(10);
+        
+        
+        ///   IR TEST   ///
+        ir_update();                       // ~1 ms period (update rate)
+        if (ir_blocked_event()) {
+            score++;
+            printf("Goal! score = %u\n", score);
+        }
+        delay_ms(1);
 
     }
-}
+} 
