@@ -4,7 +4,7 @@
 #define ADC_BASE_ADDRESS 0x1000 
 #define ADC_REG (*(volatile uint8_t *)(ADC_BASE_ADDRESS))
 
-// Configurazione del pin BUSY (collegato al microcontrollore)
+// BUSY Pin config
 #define BUSY_PORT PINB
 #define BUSY_PIN  PB0
 
@@ -38,14 +38,14 @@ uint8_t ADC_ReadChannel(uint8_t channel) {
     // I bit D2, D1, D0 contain the channel number (0-3)
     uint8_t config_byte = 0b10000000 | channel;
 
-    // 1. Writes the configuration. This generates automatically the WR pulse.
+    // Writes the configuration. This generates automatically the WR pulse.
     ADC_REG = config_byte;
 
-    // 2. Wait until the BUSY pin is low (conversion in progress)
+    // Wait until the BUSY pin is low (conversion in progress)
     while (!(BUSY_PORT & (1 << BUSY_PIN))) {
         // Waiting loop (blocking)
     }
 
-    // 3. Read the result. This generates automatically the RD pulse.
+    // Read the result. This generates automatically the RD pulse.
     return ADC_REG;
 }

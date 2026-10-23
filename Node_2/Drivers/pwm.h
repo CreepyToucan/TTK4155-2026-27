@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "sam.h"
 
-// 1. Hardware Mapping Structure
+// Hardware Mapping Structure
 typedef struct {
     Pio* pio_port;        // Pointer to the PIO controller (e.g., PIOC)
     uint32_t pin_mask;    // Bitmask for the pin (e.g., PIO_PDR_P22)
@@ -13,7 +13,7 @@ typedef struct {
     uint32_t pio_id;      // Peripheral ID for the PIO port (e.g., ID_PIOC)
 } pwm_pin_config_t;
 
-// 2. Pre-defined Arduino Due PWM pins
+// Pre-defined Arduino Due PWM pins
 // Declared as extern so they can be defined once in the .c file and used anywhere
 extern const pwm_pin_config_t DUE_PIN_6;
 extern const pwm_pin_config_t DUE_PIN_7;
@@ -21,7 +21,7 @@ extern const pwm_pin_config_t DUE_PIN_8;
 extern const pwm_pin_config_t DUE_PIN_9;
 extern const pwm_pin_config_t DUE_PIN_21;
 
-// 3. Function Prototypes
+// Function Prototypes
 
 /**
  * @brief Initializes a specific PWM pin with a target frequency.

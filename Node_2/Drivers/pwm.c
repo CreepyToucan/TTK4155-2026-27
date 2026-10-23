@@ -2,7 +2,7 @@
 #include "pwm.h"
 
 
-// 2. Pre-define common Arduino Due PWM pins for easy use
+// Pre-define common Arduino Due PWM pins for easy use
 // You can find these mappings in the SAM3X8E datasheet.
 const pwm_pin_config_t DUE_PIN_6 = { PIOC, PIO_PC24, 1, 7, ID_PIOC }; // PC24, Periph B, Ch 7
 const pwm_pin_config_t DUE_PIN_7 = { PIOC, PIO_PC23, 1, 6, ID_PIOC }; // PC23, Periph B, Ch 6
@@ -11,7 +11,7 @@ const pwm_pin_config_t DUE_PIN_9 = { PIOC, PIO_PC21, 1, 4, ID_PIOC }; // PC21, P
 const pwm_pin_config_t DUE_PIN_21 = { PIOB, PIO_PB13, 1, 1, ID_PIOB };
 
 
-// 3. Initialize the global PWM clock and the specific pin/channel
+// Initialize the global PWM clock and the specific pin/channel
 void pwm_init(const pwm_pin_config_t* config, uint32_t frequency) {
     // Enable the clock for the specific PIO port
     PMC->PMC_PCER0 = (1 << config->pio_id);
@@ -48,7 +48,7 @@ void pwm_init(const pwm_pin_config_t* config, uint32_t frequency) {
 }
 
 
-// 4. Update the duty cycle for a specific configured pin
+// Update the duty cycle for a specific configured pin
 void pwm_set_duty(const pwm_pin_config_t* config, uint8_t duty_percent) {
     if (duty_percent > 100) duty_percent = 100;
 
