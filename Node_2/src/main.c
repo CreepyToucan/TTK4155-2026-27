@@ -11,6 +11,7 @@
 #include "../Libraries/Servo.h"
 #include "../Drivers/ir.h"
 #include "../Drivers/adc.h"
+#include "../Libraries/encoder.h"
 
 // CAN Message IDs
 #define JOYX   16
@@ -30,6 +31,7 @@ int main()
     ir_init();
     can_init((CanInit){.brp = 104, .phase1 = 6, .phase2 = 5, .propag = 1 , .sjw = 0, .smp = 0}, 0);
     pwm_init(&DUE_PIN_21, 50);
+    encoder_init();
 
 
 
@@ -40,30 +42,9 @@ int main()
     while (1){
 
 
+        printf("Encoder Position: %ld\r\n", encoder_read());
 
-        CanMsg msg;
-
-        if(can_rx(&msg)){
-            
-            if(msg.id == JOYX){
-                printf("Joy X: %d\r\n", (int8_t)msg.byte[0]);
-                servoSetPosition(&DUE_PIN_21, (int8_t)msg.byte[0]);
-            }
-
-
-        }
-    
-               
-        ///   IR TEST   ///
-        
-        ir_update();                       // ~1 ms period (update rate)
-        if (ir_blocked_event()) {
-            score++;
-            printf("Goal! score = %u\r\n", score);
-        }
-
-
-        delay_ms(1);
+        delay_ms(10);
         
 
     }
