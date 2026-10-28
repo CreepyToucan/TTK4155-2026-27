@@ -18,6 +18,10 @@ int8_t HandleJOY_Y(void){
 int8_t HandleJOY_X(void){
     uint8_t raw = ADC_ReadChannel(1);
 
+    if(raw <= 165 && raw >= 161)
+        raw = 163;
+
+        
     int8_t pos = raw-163;
 
     if(pos < 0)

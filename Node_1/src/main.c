@@ -101,17 +101,13 @@ int main(void) {
     while(1) {
 
 
+        printf("Joy X: %d\r\n", getPos(Joy_x));
+
         tx_msg.id = JOYX; 
-        tx_msg.data[0] = getPos(Joy_x);
+        tx_msg.data[0] = (uint8_t)getPos(Joy_x);
         CAN_transmit(&tx_msg);
-   
+        
         _delay_ms(10);
-
-        tx_msg.id = PADX; 
-        tx_msg.data[0] = getPos(Pad_x);
-        CAN_transmit(&tx_msg);
-
-        _delay_ms(100); 
 
     }
 

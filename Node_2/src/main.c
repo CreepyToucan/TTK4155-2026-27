@@ -9,6 +9,8 @@
 #include "../Drivers/can.h"
 #include "../Drivers/pwm.h"
 #include "../Libraries/Servo.h"
+#include "../Drivers/ir.h"
+#include "../Drivers/adc.h"
 
 // CAN Message IDs
 #define JOYX   16
@@ -37,24 +39,32 @@ int main()
 
     while (1){
 
-        for(int i = -100; i < 100; i++){
-            servoSetPosition(&DUE_PIN_21, i);
-            delay_ms(10);
+
+
+        CanMsg msg;
+
+        if(can_rx(&msg)){
+            
+            if(msg.id == JOYX){
+                printf("Joy X: %d\r\n", (int8_t)msg.byte[0]);
+                servoSetPosition(&DUE_PIN_21, (int8_t)msg.byte[0]);
+            }
+
+
         }
-        
-        
-        delay_ms(10);
-        
-        
+    
+               
         ///   IR TEST   ///
-        /*
+        
         ir_update();                       // ~1 ms period (update rate)
         if (ir_blocked_event()) {
             score++;
-            printf("Goal! score = %u\n", score);
+            printf("Goal! score = %u\r\n", score);
         }
+
+
         delay_ms(1);
-        */
+        
 
     }
 } 
