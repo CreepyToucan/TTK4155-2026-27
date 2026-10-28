@@ -12,6 +12,7 @@
 #include "../Drivers/ir.h"
 #include "../Drivers/adc.h"
 #include "../Libraries/encoder.h"
+#include "../Libraries/motor.h"
 
 // CAN Message IDs
 #define JOYX   16
@@ -32,6 +33,7 @@ int main()
     can_init((CanInit){.brp = 104, .phase1 = 6, .phase2 = 5, .propag = 1 , .sjw = 0, .smp = 0}, 0);
     pwm_init(&DUE_PIN_21, 50);
     encoder_init();
+    motor_init();
 
 
 
@@ -43,6 +45,7 @@ int main()
 
 
         printf("Encoder Position: %ld\r\n", encoder_read());
+        motor_set_speed(50, MOTOR_DIR_FORWARD);
 
         delay_ms(10);
         

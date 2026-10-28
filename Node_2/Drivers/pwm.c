@@ -63,7 +63,7 @@ void pwm_set_duty(const pwm_pin_config_t* config, uint8_t duty_percent) {
 
 // Updates the duty cycle using microseconds for precise servo control
 void pwm_set_pulse_us(const pwm_pin_config_t* config, uint32_t pulse_us) {
-    // 0.9 ms = 900 us, 2.1 ms = 2100 us, typical for servo control. Ensure pulse_us is within this range.
+    // Ensure pulse_us is within this range.
     // The base clock is 1 MHz, so 1 tick = 1 microsecond.
     PWM->PWM_CH_NUM[config->channel].PWM_CDTYUPD = pulse_us;
 }
