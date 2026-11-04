@@ -1,5 +1,7 @@
 #include "encoder.h"
 
+static int32_t encoder_offset = 0;
+
 void encoder_init(void) {
     // Enable peripheral clock for TC2 Channel 0 (TC6, Peripheral ID 33)
     // PMC_PCER1 controls PIDs 32 to 63. We shift by (ID_TC6 - 32).
@@ -22,14 +24,21 @@ void encoder_init(void) {
 
     // Enable counter clock and send a software trigger to initialize the counter
     TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+    
+    // Initialize offset to 0
+    encoder_offset = 0;
 }
 
 int32_t encoder_read(void) {
-    // Return counter value register (TC_CV) as signed position
-    return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
+    // Read the raw hardware counter
+    int32_t raw_ticks = (int32_t)TC2->TC_CHANNEL[0].TC_CV;
+    
+    // Return the position relative to our calibrated zero point
+    return raw_ticks - encoder_offset;
 }
 
 void encoder_reset(void) {
-    // Performing a software trigger resets TC_CV back to zero
-    TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
+    // Instead of fighting the hardware reset requirement for clock edges,
+    // we simply record the stationary position as our new mathematical zero.
+    encoder_offset = (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }

@@ -25,8 +25,12 @@
 
 
 // CAN IDs
-#define JOYX 16
-#define PADX 15
+#define txPack 16
+
+
+// Volatile variables are required when sharing data between an ISR and the main loop
+volatile uint8_t flag_5ms = 0;
+volatile uint8_t flag_50ms = 0; 
 
 
 oled_config_t my_oled = {
@@ -58,12 +62,58 @@ const menu_item_t main_items[] = {
 menu_t main_menu = { main_items, 4 };
 
 
+int8_t joyX = 0;
+uint8_t padX = 0;
+uint8_t button = 0;
+
+
+
+void Timer0_Init(void) {
+    // Configure Timer0 in CTC mode (Clear Timer on Compare Match)
+    TCCR0 = (1 << WGM01);
+    
+    // Set Prescaler to 64
+    TCCR0 |= (1 << CS01) | (1 << CS00);
+    
+    // Calculate Compare Match value for 1ms interrupt
+    //OCR0 = (F_CPU / (Prescaler * Target_Frequency)) - 1
+    OCR0 = (F_CPU / (64 * 1000)) - 1; 
+    
+    // Enable Timer0 Compare Match Interrupt
+    TIMSK |= (1 << OCIE0);
+}
+
+
+ISR(TIMER0_COMP_vect) {
+    static uint8_t count_5ms = 0;
+    static uint8_t count_50ms = 0;
+    
+    count_5ms++;
+    count_50ms++;
+
+    // Check if 5ms has passed
+    if(count_5ms >= 5) {
+        flag_5ms = 1;     
+        count_5ms = 0;    
+    }
+    
+    // Check if 50ms has passed
+    if(count_50ms >= 50) {
+        flag_50ms = 1;
+        count_50ms = 0;
+    }
+}
+
+
+
 int main(void) {
 
 
     ///   SETUP   ///
 
     UART_Init(MYUBRR);
+    Timer0_Init();
+    sei();
     xmem_init();
     ADC_Init();
     initButton();
@@ -88,12 +138,13 @@ int main(void) {
     // CAN messages definitio //
     can_message_t tx_msg;
     tx_msg.id = 0x123;         // 11-bit standard ID
-    tx_msg.length = 1;         // 1 byte of data
-    tx_msg.data[0] = 0xDE;
+    tx_msg.length = 3;         // 3 bytes of data
+    tx_msg.data[0] = 0x00;
+    tx_msg.data[1] = 0x00;
+    tx_msg.data[2] = 0x00;
 
 
     can_message_t rx_msg;
-
 
 
     ///   LOOP  ///
@@ -101,16 +152,39 @@ int main(void) {
     while(1) {
 
 
-        printf("Joy X: %d\r\n", getPos(Joy_x));
+        if(flag_5ms){
 
-        tx_msg.id = JOYX; 
-        tx_msg.data[0] = (uint8_t)getPos(Joy_x);
-        CAN_transmit(&tx_msg);
-        
-        _delay_ms(10);
+            flag_5ms = 0; // Clear the flag immediately
+
+            /// SAMPLING ///
+            joyX = getPos(Joy_x);
+            padX = HandlePad_X();
+            button = getButton();
+            //printf("Joy X: %d, Pad X: %d, Button: %d\n", joyX, padX, button);
+
+            /// TRANSMISSION ///
+            tx_msg.id = txPack; 
+            tx_msg.data[0] = (uint8_t)joyX;
+            tx_msg.data[1] = padX;
+            tx_msg.data[2] = button;
+            CAN_transmit(&tx_msg); 
+
+        }
+
+
+        if(flag_50ms){
+
+            flag_50ms = 0; // Clear the flag immediately
+
+            /// RECEPTION ///
+            if(CAN_receive(&rx_msg)){
+                // Process received message
+                printf("Received CAN message with ID: %X\n", rx_msg.id);
+            }
+        }
 
     }
-
+    
 
     return 0;
 }

@@ -4,6 +4,13 @@
 #include "ADC.h"
 #include "UART.h"
 
+#define F_CPU 4915200UL
+#define BAUD 9600
+#define MYUBRR F_CPU/16/BAUD-1
+
+#include <util/delay.h>
+
+
 int8_t HandleJOY_Y(void){
     uint8_t raw = ADC_ReadChannel(0);
 
@@ -30,14 +37,14 @@ int8_t HandleJOY_X(void){
         return (pos*100/82);
 }
 
-int8_t HandlePad_Y(void){
+uint8_t HandlePad_Y(void){
     uint8_t raw = ADC_ReadChannel(2);
-    return raw*100/255;
+    return raw;
 } 
 
-int8_t HandlePad_X(void){
+uint8_t HandlePad_X(void){
     uint8_t raw = ADC_ReadChannel(3);
-    return raw*100/255;
+    return raw;
 }
 
 
@@ -48,15 +55,11 @@ int8_t getPos(InputType obj) {
             return HandleJOY_Y();
         case Joy_x:
             return HandleJOY_X();
-        case Pad_y:
-            return HandlePad_Y();
-        case Pad_x:
-            return HandlePad_X();
+
         default:
             return -1;
     }
 }
-
 
 char getDir(InputType obj){
     
@@ -77,19 +80,7 @@ char getDir(InputType obj){
                 return 'L';
             else
                 return 'N';
-
-        case Pad_y:
-            if(HandlePad_Y() > 50)
-                return 'U';
-            else
-                return 'D';
-        
-        case Pad_x:
-            if(HandlePad_X() > 50)
-                return 'R';
-            else
-                return 'L';
-            
+              
         default:
             return 'X';
     }

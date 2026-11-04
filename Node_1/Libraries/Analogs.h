@@ -22,14 +22,12 @@ int8_t HandleJOY_Y(void);
 int8_t HandleJOY_X(void);
 
 // Normalized values for pad_Y readings
-/** @return int8_t [0 ; 100]  Down, Up
- * */
-int8_t HandlePad_Y(void);
+// @return uint8_t [0 ; 255]  Down, Up
+uint8_t HandlePad_Y(void);
 
 // Normalized values for pad_X readings
-/** @return int8_t [0 ; 100]  Left, Right
- * */
-int8_t HandlePad_X(void);
+// @return uint8_t [0 ; 255]  Left, Right
+uint8_t HandlePad_X(void);
 
 // Get the normalized position for a specific input
 /** @param obj The input axis to read
