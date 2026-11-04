@@ -6,11 +6,11 @@
 
 // Hardware Mapping Structure
 typedef struct {
-    Pio* pio_port;        // Pointer to the PIO controller (e.g., PIOC)
-    uint32_t pin_mask;    // Bitmask for the pin (e.g., PIO_PDR_P22)
+    Pio* pio_port;        // Pointer to the PIO controller
+    uint32_t pin_mask;    // Bitmask for the pin
     uint32_t peripheral;  // 0 for Peripheral A, 1 for Peripheral B
     uint32_t channel;     // PWM Channel number (0-7)
-    uint32_t pio_id;      // Peripheral ID for the PIO port (e.g., ID_PIOC)
+    uint32_t pio_id;      // Peripheral ID for the PIO port
 } pwm_pin_config_t;
 
 // Pre-defined Arduino Due PWM pins
@@ -24,18 +24,18 @@ extern const pwm_pin_config_t DUE_PIN_21;
 // Function Prototypes
 
 /**
- * @brief Initializes a specific PWM pin with a target frequency.
+ * @brief Initializes a specific PWM pin with a target frequency
  * 
- * @param config Pointer to the pin configuration structure.
- * @param frequency Desired PWM frequency in Hz.
+ * @param config Pointer to the pin configuration structure
+ * @param frequency Desired PWM frequency in Hz
  */
 void pwm_init(const pwm_pin_config_t* config, uint32_t frequency);
 
 /**
- * @brief Sets the duty cycle for a specific PWM pin.
+ * @brief Sets the duty cycle for a specific PWM pin
  * 
- * @param config Pointer to the pin configuration structure.
- * @param duty_percent Desired duty cycle percentage (0-100).
+ * @param config Pointer to the pin configuration structure
+ * @param duty_percent Desired duty cycle percentage (0-100)
  */
 void pwm_set_duty(const pwm_pin_config_t* config, uint8_t duty_percent);
 

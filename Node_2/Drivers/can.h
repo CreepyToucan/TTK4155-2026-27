@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 // Struct with bit timing information
-// See `can_init` for usage example
 typedef struct CanInit CanInit;
 __attribute__((packed)) struct CanInit {
     union {
@@ -21,10 +20,7 @@ __attribute__((packed)) struct CanInit {
 
 
 // Initialize CAN bus, with bit timings and optional interrupt
-// If `rxInterrupt` is not 0, an interrupt will be triggered when a message is received.
-// (See can.c for an example interrupt handler)
-// Example:
-//    can_init((CanInit){.brp = F_CPU/2000000-1, .phase1 = 5, .phase2 = 1, .propag = 6}, 0);
+// If `rxInterrupt` is not 0, an interrupt will be triggered when a message is received
 void can_init(CanInit init, uint8_t rxInterrupt);
 
 
@@ -79,7 +75,7 @@ struct CanMsg {
     };    
 };
 
-// Send a CAN message on the bus. 
+// Send a CAN message on the bus
 // Blocks if the bus does not receive the message (typically because one of the 
 // receiving nodes has not cleared a buffer)
 void can_tx(CanMsg m);

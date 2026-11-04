@@ -45,7 +45,7 @@ void spi_write_byte(uint8_t data) {
 }
 
 uint8_t spi_read_byte(void) {
-    // Transmit a dummy byte (e.g., 0xFF) to generate the clock pulses needed for reading
+    // Transmit a dummy byte to generate the clock pulses needed for reading
     SPDR = 0xFF;
     
     // Wait for the reception to complete

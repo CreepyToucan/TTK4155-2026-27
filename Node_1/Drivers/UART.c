@@ -7,14 +7,14 @@
 
 // Initialize the UART interface
 void UART_Init(unsigned int ubrr) {
-    // 1. Set baud rate
+    // Set baud rate
     UBRR0H = (unsigned char)(ubrr >> 8);
     UBRR0L = (unsigned char)ubrr;
     
-    // 2. Enable receiver, transmitter, and receive interrupts
+    // Enable receiver, transmitter, and receive interrupts
     UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
     
-    // 3. Set frame format: 8 data bits, 1 stop bit
+    // Set frame format: 8 data bits, 1 stop bit
     // Note: On the ATmega162, URSEL0 must be written to 1 when writing to UCSR0C
     UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
 

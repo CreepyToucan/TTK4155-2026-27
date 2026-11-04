@@ -6,7 +6,6 @@
 /**
  * @name I/O Board Command Definitions
  * Command bytes for each operation supported by the I/O board in SPI slave mode.
- * @{
  */
 #define IO_CMD_TOUCHPAD 0x01
 #define IO_CMD_SLIDER   0x02
@@ -15,7 +14,7 @@
 #define IO_CMD_LED_ON   0x05
 #define IO_CMD_LED_PWM  0x06
 #define IO_CMD_INFO     0x07
-/** @} */
+/**  */
 
 /**
  * @brief Configuration struct for the I/O board SPI pin

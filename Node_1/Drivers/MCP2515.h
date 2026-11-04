@@ -14,12 +14,11 @@
 #define MCP_RTS_BASE    0x80 /**< 1000 0nnn: Base command to instruct controller to begin message transmission */
 #define MCP_READ_STATUS 0xA0 /**< 1010 0000: Quick polling command that reads status bits for TX/RX functions */
 #define MCP_BIT_MODIFY  0x05 /**< 0000 0101: Allows the user to set or clear individual bits in a particular register */
-/** @} */
+
 
 /**
  * @name RTS Transmit Buffer Masks
  * Bitmasks to select which transmit buffers to send via the RTS command.
- * @{
  */
 #define MCP_RTS_TXB0 0x01 /**< Request-to-send for TXB0 */
 #define MCP_RTS_TXB1 0x02 /**< Request-to-send for TXB1 */

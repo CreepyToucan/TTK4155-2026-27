@@ -9,7 +9,7 @@ typedef struct {
     volatile uint8_t *ctrl_ddr;  // Data Direction Register for D/C#
     uint8_t dc_pin;              // Data/Command pin number
     
-    volatile uint8_t *cs_port;   // Port for Chip Select (e.g., &PORTB)
+    volatile uint8_t *cs_port;   // Port for Chip Select 
     uint8_t cs_pin;              // Chip Select pin number
 } oled_config_t;
 

@@ -61,14 +61,13 @@ void oled_init(const oled_config_t *config) {
 }
 
 void oled_goto_line(uint8_t line) {
-    // In Page Addressing Mode, the GDDRAM is divided into 8 pages (0-7)[cite: 2]
     oled_write_cmd(0xB0 | (line & 0x07)); 
 }
 
 void oled_goto_column(uint8_t column) {
-    // Command 00h~0Fh specifies the lower nibble of the column start address[cite: 2]
+    // Command 00h-0Fh specifies the lower nibble of the column start address
     oled_write_cmd(0x00 | (column & 0x0F)); 
-    // Command 10h~1Fh specifies the higher nibble of the column start address[cite: 2]
+    // Command 10h-1Fh specifies the higher nibble of the column start address
     oled_write_cmd(0x10 | ((column >> 4) & 0x0F)); 
 }
 
