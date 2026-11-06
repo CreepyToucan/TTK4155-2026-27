@@ -17,12 +17,9 @@ void solenoid_init(void) {
 void solenoid_shoot(void) {
     // Set the pin HIGH to turn on the transistor and fire the solenoid
     PIOB->PIO_SODR = SOLENOID_PIN; 
+}
 
-    // Wait for a short duration
-    // Tune this loop count so the pulse is just long enough to hit the ball
-    for (volatile uint32_t i = 0; i < (100 * 8400); i++); 
-    
-
-    // Set the pin LOW to turn off the transistor and end the pulse
+void solenoid_rest(void){
+      // Set the pin LOW to turn off the transistor and end the pulse
     PIOB->PIO_CODR = SOLENOID_PIN; 
 }

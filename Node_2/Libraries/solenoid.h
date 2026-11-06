@@ -10,11 +10,8 @@
  */
 void solenoid_init(void);
 
-/**
- * @brief Generates a short hardware pulse to actuate the solenoid
- *        The pulse duration is deliberately kept short to prevent the electromagnet
- *        from overheating and being damaged
- */
 void solenoid_shoot(void);
+
+void solenoid_rest(void);
 
 #endif // SOLENOID_H

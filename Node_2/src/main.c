@@ -27,8 +27,6 @@
 #define SAMPLE_TIME_MS    10
 #define SAMPLE_TIME_SEC   (SAMPLE_TIME_MS / 1000.0f)
 
-uint32_t last_1ms_tick = 0;
-uint32_t last_5ms_tick = 0;
 uint32_t last_10ms_tick = 0;
 uint32_t last_20ms_tick = 0;
 uint32_t last_50ms_tick = 0;
@@ -75,28 +73,14 @@ int main(){
         uint32_t current_time = totalMsecs(time_now());
 
 
-
-        if(current_time - last_1ms_tick >= 1) {
-            last_1ms_tick = current_time;
-             servoSetPosition(&DUE_PIN_21, joyX); 
+        // Read joystick and trackpad inputs from CAN as fast as possible
+        if(can_rx(&RXmsg)){
+            joyX = (int8_t)RXmsg.byte[0];
+            padX = RXmsg.byte[1];
+            button = RXmsg.byte[2];
         }
 
-
-
-        if(current_time - last_5ms_tick >= 5) {
-
-            last_5ms_tick = current_time;
-
-            // Read joystick and trackpad inputs from CAN
-            if(can_rx(&RXmsg)){
-                joyX = (int8_t)RXmsg.byte[0];
-                padX = RXmsg.byte[1];
-                button = RXmsg.byte[2];
-            }
-
-            printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  
-
-        }
+        printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  //to be reomoved : is fucking up the scheduler
 
 
         if (current_time - last_10ms_tick >= 10) {
@@ -122,18 +106,19 @@ int main(){
                 motor_set_speed((uint8_t)(-control_output), MOTOR_DIR_REVERSE);
             }    
             
-            
-            servoSetPosition(&DUE_PIN_21, joyX); 
-
-            
         }
 
        if (current_time - last_20ms_tick >= 20) {
 
             last_20ms_tick = current_time;
 
+            servoSetPosition(&DUE_PIN_21, joyX); 
+
             if(button == 1){
                 solenoid_shoot();
+            }
+            else{
+                solenoid_rest();
             }
             
         }    
