@@ -54,7 +54,7 @@ int main(){
     // Initialize PI controller
     PIDController pos_pid;
     // P-I-D
-    pid_init(&pos_pid, 0.08f, 0.1f, 0.0f, -100.0f, 100.0f);
+    pid_init(&pos_pid, 0.06f, 0.01f, 0.0f, -100.0f, 100.0f);
     calibrate_encoder_to_left_stop();
 
 
@@ -78,12 +78,15 @@ int main(){
             joyX = (int8_t)RXmsg.byte[0];
             padX = RXmsg.byte[1];
             button = RXmsg.byte[2];
+
         }
 
-        printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  //to be reomoved : is fucking up the scheduler
+        //printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  //to be reomoved : is fucking up the scheduler
 
 
         if (current_time - last_10ms_tick >= 10) {
+
+            //printf("PAD: %d\r\n", padX);
 
             last_10ms_tick = current_time;
 

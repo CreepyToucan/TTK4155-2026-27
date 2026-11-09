@@ -92,7 +92,7 @@ ISR(TIMER0_COMP_vect) {
     count_50ms++;
 
     // Check if 5ms has passed
-    if(count_5ms >= 5) {
+    if(count_5ms >= 8) {
         flag_5ms = 1;     
         count_5ms = 0;    
     }

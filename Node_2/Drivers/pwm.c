@@ -1,9 +1,6 @@
 #include "sam.h"
 #include "pwm.h"
 
-
-// Pre-define common Arduino Due PWM pins for easy use
-// You can find these mappings in the SAM3X8E datasheet
 const pwm_pin_config_t DUE_PIN_6 = { PIOC, PIO_PC24, 1, 7, ID_PIOC }; // PC24, Periph B, Ch 7
 const pwm_pin_config_t DUE_PIN_7 = { PIOC, PIO_PC23, 1, 6, ID_PIOC }; // PC23, Periph B, Ch 6
 const pwm_pin_config_t DUE_PIN_8 = { PIOC, PIO_PC22, 1, 5, ID_PIOC }; // PC22, Periph B, Ch 5
@@ -28,7 +25,6 @@ void pwm_init(const pwm_pin_config_t* config, uint32_t frequency) {
     }
 
     // Configure the PWM Global Clock (Clock A) to 1 MHz
-    // Note: If calling this multiple times, Clock A is overwritten
     // This assumes all initialized channels use the same base clock
     PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84); // 84MHz / 84 = 1MHz
 
