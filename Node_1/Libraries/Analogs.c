@@ -38,13 +38,11 @@ int8_t HandleJOY_X(void){
 }
 
 uint8_t HandlePad_Y(void){
-    uint8_t raw = ADC_ReadChannel(2);
-    return raw;
+    return ADC_ReadChannel(2);;
 } 
 
 uint8_t HandlePad_X(void){
-    uint8_t raw = ADC_ReadChannel(3);
-    return raw;
+    return ADC_ReadChannel(3);
 }
 
 

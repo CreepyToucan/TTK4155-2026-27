@@ -42,9 +42,7 @@ uint8_t ADC_ReadChannel(uint8_t channel) {
     ADC_REG = config_byte;
 
     // Wait until the BUSY pin is low (conversion in progress)
-    while (!(BUSY_PORT & (1 << BUSY_PIN))) {
-        // Waiting loop (blocking)
-    }
+    while (!(BUSY_PORT & (1 << BUSY_PIN))) {}
 
     // Read the result. This generates automatically the RD pulse.
     return ADC_REG;

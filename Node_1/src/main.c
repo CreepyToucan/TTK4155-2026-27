@@ -92,7 +92,7 @@ ISR(TIMER0_COMP_vect) {
     count_50ms++;
 
     // Check if 5ms has passed
-    if(count_5ms >= 8) {
+    if(count_5ms >= 5) {
         flag_5ms = 1;     
         count_5ms = 0;    
     }
@@ -152,6 +152,15 @@ int main(void) {
     while(1) {
 
 
+
+        /// RECEPTION ///
+        if(CAN_receive(&rx_msg)){
+            // Process received message
+            printf("Received CAN message with ID: %X\n", rx_msg.id);
+        }
+
+
+
         if(flag_5ms){
 
             flag_5ms = 0; // Clear the flag immediately
@@ -160,7 +169,7 @@ int main(void) {
             joyX = getPos(Joy_x);
             padX = HandlePad_X();
             button = getButton();
-            //printf("Joy X: %d, Pad X: %d, Button: %d\n", joyX, padX, button);
+            //printf("Joy X: %d, Pad X: %d, Button: %d\n", joyX, padX, button); //need to remove to keep the 5ms loop fast enough for CAN transmission
 
             /// TRANSMISSION ///
             tx_msg.id = txPack; 
@@ -169,18 +178,6 @@ int main(void) {
             tx_msg.data[2] = button;
             CAN_transmit(&tx_msg); 
 
-        }
-
-
-        if(flag_50ms){
-
-            flag_50ms = 0; // Clear the flag immediately
-
-            /// RECEPTION ///
-            if(CAN_receive(&rx_msg)){
-                // Process received message
-                printf("Received CAN message with ID: %X\n", rx_msg.id);
-            }
         }
 
     }
