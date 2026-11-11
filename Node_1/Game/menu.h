@@ -3,7 +3,7 @@
 #define MENU_H
 
 typedef struct {
-    const char* label;
+    const char* label;   // must point to a string in flash (PROGMEM), it is drawn with oled_print_P
 } menu_item_t;
 
 typedef struct {
