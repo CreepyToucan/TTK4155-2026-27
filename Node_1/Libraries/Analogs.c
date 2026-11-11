@@ -70,8 +70,8 @@ char getDir(InputType obj) {
     switch (obj) {
         case Joy_y: {
             int8_t v = HandleJOY_Y();   // read once, not once per comparison
-            if (v > 2)  return 'U';
-            if (v < -2) return 'D';
+            if (v > 2)  return 'D';
+            if (v < -2) return 'U';
             return 'N';
         }
         case Joy_x: {

@@ -1,6 +1,9 @@
+#define F_CPU 4915200UL
+
 #include "io_board.h"
 #include "SPI.h"
 #include <avr/io.h>
+#include <util/delay.h>
 
 static io_board_config_t io_cfg;
 
@@ -51,6 +54,7 @@ io_buttons_t io_getButtons(void) {
     spi_select_slave(io_cfg.cs_port, io_cfg.cs_pin, 1);
     
     spi_write_byte(IO_CMD_BUTTONS);  // Command 0x04
+    _delay_ms(5); // give the IO board time to prepare its response
     data.right = spi_read_byte();    // Read right
     data.left = spi_read_byte();     // Read left
     data.nav = spi_read_byte();      // Read nav

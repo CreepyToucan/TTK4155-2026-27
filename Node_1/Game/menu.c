@@ -1,17 +1,31 @@
 // menu.c
 #define F_CPU 4915200UL
+#define BAUD 9600
+#define MYUBRR (F_CPU/16/BAUD-1)
 
 #include <stdio.h>
 #include <util/delay.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include "menu.h"
 #include "Oled.h"
 #include "Analogs.h"
 #include "io_board.h"
 #include "highscores.h"
+#include "CAN.h"
 
+#define CONTROL_CAN_ID      16     // joystick/slider/button frame to Node 2 (txPack)
+#define GOAL_CAN_ID         20     // sent by Node 2 when the IR beam is broken
+#define CONTROL_PERIOD_MS   5
+#define QUIT_POLL_MS        50
 #define BUTTON_SELECT       32     // io_getButtons().right value of the select button
 #define CAL_DURATION_MS     5000
 #define CAL_MIN_SPAN        80     // min raw range per axis for a valid calibration
+
+// 0 = Easy, 1 = Medium, 2 = Hard
+static uint8_t difficulty = 1;
+static const uint8_t lives_per_difficulty[3] = {5, 3, 1};
+static const uint8_t score_multiplier[3]     = {1, 2, 3};
 
 // Waits for the select button to be released, pressed, and released again.
 static void wait_for_click(void) {
@@ -110,11 +124,8 @@ void start_calibration(void) {
     oled_pos(0, 0, 5); oled_print("Rotate joystick", 5);
     oled_pos(1, 0, 5); oled_print("in full circles", 5);
 
-    uint32_t start_ms = timer_ms();
-    uint32_t last_ui  = 0;
-    uint32_t elapsed;
-
-    while ((elapsed = timer_ms() - start_ms) < CAL_DURATION_MS) {
+    uint8_t i = 0;
+    while (i<5000) {
         uint8_t x = getRawJOY_X();
         uint8_t y = getRawJOY_Y();
         if (x > mx_x) mx_x = x;
@@ -122,16 +133,15 @@ void start_calibration(void) {
         if (y > mx_y) mx_y = y;
         if (y < mn_y) mn_y = y;
 
-        if (elapsed - last_ui >= 200) {   // redraw only ~5x per second
-            last_ui = elapsed;
-            uint8_t secs_left = (CAL_DURATION_MS - elapsed + 999) / 1000;
-            sprintf(buf, "X: %3d to %3d", mn_x, mx_x);
-            oled_pos(3, 0, 5); oled_print(buf, 5);
-            sprintf(buf, "Y: %3d to %3d", mn_y, mx_y);
-            oled_pos(4, 0, 5); oled_print(buf, 5);
-            sprintf(buf, "Time left: %ds", secs_left);
-            oled_pos(6, 0, 5); oled_print(buf, 5);
-        }
+        uint8_t secs_left = 5 - (i/1000);
+        sprintf(buf, "X: %3d to %3d", mn_x, mx_x);
+        oled_pos(3, 0, 5); oled_print(buf, 5);
+        sprintf(buf, "Y: %3d to %3d", mn_y, mx_y);
+        oled_pos(4, 0, 5); oled_print(buf, 5);
+        sprintf(buf, "Time left: %ds", secs_left);
+        oled_pos(6, 0, 5); oled_print(buf, 5);
+        _delay_ms(100);
+        i++;
     }
 
     // Step 3: accept only if the joystick was actually moved
@@ -190,6 +200,117 @@ void show_high_scores(void) {
     wait_for_click();
 }
 
+static void game_countdown(void) {
+    char buf[4];
+    oled_clear();
+    oled_pos(2, 0, 5); oled_print("Get ready!", 5);
+    for (uint8_t n = 3; n > 0; n--) {
+        sprintf(buf, "%d", n);
+        oled_pos(4, 0, 8);
+        oled_print(buf, 8);
+        _delay_ms(1000);
+    }
+}
+
+static void game_draw_lives(uint8_t lives) {
+    char buf[16];
+    sprintf(buf, "Lives: %d", lives);
+    oled_pos(2, 0, 5);
+    oled_print(buf, 5);
+}
+
+static void game_draw_time(uint16_t seconds) {
+    char buf[16];
+    sprintf(buf, "Time: %3us", seconds);   // fixed width, overwrites the old value
+    oled_pos(4, 0, 5);
+    oled_print(buf, 5);
+}
+
+static void game_over_screen(uint16_t score, uint8_t rank) {
+    char buf[24];
+    oled_clear();
+    oled_pos(0, 0, 8); oled_print("GAME OVER", 8);
+    sprintf(buf, "Score: %u", score);
+    oled_pos(3, 0, 5); oled_print(buf, 5);
+    if (rank) {
+        oled_pos(4, 0, 5); oled_print("New high score!", 5);
+        sprintf(buf, "Rank: %d", rank);
+        oled_pos(5, 0, 5); oled_print(buf, 5);
+    } else {
+        oled_pos(4, 0, 5); oled_print("Not in the top 5", 5);
+    }
+    oled_pos(7, 0, 5); oled_print("Click to continue", 5);
+    wait_for_click();
+}
+
 void start_new_game(void) {
-    //todo
+    uint8_t lives = lives_per_difficulty[difficulty];
+    uint8_t padX = 0;
+    uint16_t seconds = 0, shown_seconds = 0xFFFF;
+
+    can_message_t tx;
+    tx.id = CONTROL_CAN_ID;
+    tx.length = 3;
+    can_message_t rx;
+
+    game_countdown();
+
+    // Drop every old msg that arrived while we weren't listening
+    for (uint8_t i = 0; i < 3; i++) CAN_receive(&rx);
+
+    oled_clear();
+    oled_pos(0, 0, 5); oled_print("Playing!", 5);
+    oled_pos(7, 0, 5); oled_print("Click to quit", 5);
+    game_draw_lives(lives);
+
+    uint32_t start_ms     = timer_ms();
+    uint32_t last_ctrl_ms = start_ms;
+    uint32_t last_quit_ms = start_ms;
+
+    while (lives > 0) {
+        uint32_t now = timer_ms();
+
+        // Recieve Goal msg from Node 2 (the ball passed the IR beam)
+        if (CAN_receive(&rx) && rx.id == GOAL_CAN_ID) {
+            lives--;
+            game_draw_lives(lives);
+            if (lives == 0) break;
+        }
+
+        // Send controls to Node 2 every 5 ms
+        if (now - last_ctrl_ms >= CONTROL_PERIOD_MS) {
+            last_ctrl_ms = now;
+            padX = HandlePad_X();
+            tx.data[0] = (uint8_t)getPos(Joy_x);
+            tx.data[1] = padX;
+            tx.data[2] = getButton();
+            CAN_transmit(&tx);
+        }
+
+        // Elapsed time: redraw timer once per second
+        seconds = (uint16_t)((now - start_ms) / 1000);
+        if (seconds != shown_seconds) {
+            shown_seconds = seconds;
+            game_draw_time(seconds);
+        }
+
+        // Quit button (polled slowly to keep SPI traffic low)
+        if (now - last_quit_ms >= QUIT_POLL_MS) {
+            last_quit_ms = now;
+            if (io_getButtons().right == BUTTON_SELECT) break;
+        }
+    }
+
+    // Game over
+    // Neutral command so the motor and solenoid don't keep acting on the last msg
+    tx.data[0] = 0;
+    tx.data[1] = padX;
+    tx.data[2] = 0;
+    CAN_transmit(&tx);
+
+    seconds = (uint16_t)((timer_ms() - start_ms) / 1000);
+    uint16_t score = seconds * score_multiplier[difficulty];
+    uint8_t rank = highscores_add(score);
+
+    game_over_screen(score, rank);
 }

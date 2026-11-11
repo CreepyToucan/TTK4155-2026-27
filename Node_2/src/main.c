@@ -20,6 +20,7 @@
 // CAN Message IDs
 #define rxPack 16
 #define txPack 17
+#define GOAL 20
 
 
 // Set this to the maximum encoder count corresponding to full right travel
@@ -75,6 +76,7 @@ int main(){
 
         uint32_t current_time = totalMsecs(time_now());
 
+        //printf("Encoder Position: %ld\r\n", encoder_read());
 
         // Read joystick and trackpad inputs from CAN as fast as possible
         if(can_rx(&RXmsg)){
@@ -99,7 +101,7 @@ int main(){
                 if(ir_blocked_event()){
                     score++;
                     //printf("IR blocked! Score: %d\r\n", score);
-                    TXmsg.id = txPack;
+                    TXmsg.id = GOAL;
                     TXmsg.length = 1;
                     TXmsg.byte[0] = score;
                     can_tx(TXmsg);
@@ -147,6 +149,5 @@ int main(){
             }
             
         }    
-        
     }
 } 

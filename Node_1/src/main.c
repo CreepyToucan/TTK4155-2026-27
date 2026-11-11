@@ -1,6 +1,6 @@
 #define F_CPU 4915200UL
 #define BAUD 9600
-#define MYUBRR F_CPU/16/BAUD-1
+#define MYUBRR (F_CPU/16/BAUD-1)
 
 #include <util/delay.h>
 #include <avr/io.h>
@@ -16,17 +16,16 @@
 #include "menu.h"
 #include "MCP2515.h"
 #include "CAN.h"
+#include "highscores.h"
 
-//slave cs pin
+// slave cs pins
 #define IO_board PB1
-#define Oled PB2    
+#define Oled PB2
 #define CAN_MCP2515 PB3
-
 
 // CAN IDs
 #define txPack 16
 #define rxPack 17
-
 
 oled_config_t my_oled = {
     .ctrl_port = &PORTD,
@@ -35,7 +34,6 @@ oled_config_t my_oled = {
     .cs_port   = &PORTB,
     .cs_pin    = PB2
 };
-
 
 io_board_config_t my_IO = {
     .cs_port = &PORTB,
@@ -53,8 +51,6 @@ const menu_item_t main_items[] = {
     {"High Scores"},
     {"Quit"}
 };
-
-menu_t main_menu = { main_items, 4 };
 
 int8_t joyX = 0;
 uint8_t padX = 0;
@@ -111,13 +107,11 @@ ISR(TIMER0_COMP_vect) {
     }
 }
 
-
+menu_t main_menu = { main_items, 4 };
 
 int main(void) {
 
-
     ///   SETUP   ///
-
     UART_Init(MYUBRR);
     Timer0_Init();
     sei();
@@ -125,10 +119,12 @@ int main(void) {
     ADC_Init();
     initButton();
     spi_init();
+
     // initialize cs pins for each slave //
     slave_init(Oled);
     slave_init(IO_board);
     slave_init(CAN_MCP2515);
+    
     // initialize slaves SPI pins //
     oled_init(&my_oled);
     io_board_init(&my_IO);
@@ -138,7 +134,7 @@ int main(void) {
     mcp2515_reset();
     CAN_set_mode(CAN_MODE_CONFIG);
     // CNF1 = SWJ:1 BRP:9, CNF2 = BTLMODE:1 SAM:0 PHSEG1:6 PRSEG:1, CNF3 = PHSEG2:5
-    CAN_init(0x09, 0xB1, 0x05); 
+    CAN_init(0x09, 0xB1, 0x05);
     CAN_set_mode(CAN_MODE_NORMAL);
 
     
@@ -215,7 +211,5 @@ int main(void) {
 
 
     }
-    
-
     return 0;
 }
