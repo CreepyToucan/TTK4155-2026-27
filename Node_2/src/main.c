@@ -19,7 +19,7 @@
 
 // CAN Message IDs
 #define rxPack 16
-
+#define txPack 17
 
 
 // Set this to the maximum encoder count corresponding to full right travel
@@ -27,14 +27,16 @@
 #define SAMPLE_TIME_MS    10
 #define SAMPLE_TIME_SEC   (SAMPLE_TIME_MS / 1000.0f)
 
-uint32_t last_10ms_tick = 0;
-uint32_t last_20ms_tick = 0;
-uint32_t last_50ms_tick = 0;
-
-
 void delay_ms(uint32_t ms) {
 for (volatile uint32_t i = 0; i < (ms * 8400); i++); 
 }
+
+
+uint32_t last_1ms_tick = 0;
+uint32_t last_5ms_tick = 0;
+uint32_t last_10ms_tick = 0;
+uint32_t last_20ms_tick = 0;
+uint32_t last_50ms_tick = 0;
 
 
 int main(){
@@ -60,6 +62,7 @@ int main(){
 
     uint8_t score = 0;
     CanMsg RXmsg;
+    CanMsg TXmsg;
 
 
     int8_t joyX = 0;
@@ -84,6 +87,27 @@ int main(){
         //printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  //to be reomoved : is fucking up the scheduler
 
 
+        if(current_time - last_1ms_tick >= 1) {
+            last_1ms_tick = current_time;
+            ir_update();   //ir update every 1ms 
+
+        }
+
+        if (current_time - last_5ms_tick >= 5) {
+                last_5ms_tick = current_time;
+
+                if(ir_blocked_event()){
+                    score++;
+                    //printf("IR blocked! Score: %d\r\n", score);
+                    TXmsg.id = txPack;
+                    TXmsg.length = 1;
+                    TXmsg.byte[0] = score;
+                    can_tx(TXmsg);
+                }
+               
+            }
+
+
         if (current_time - last_10ms_tick >= 10) {
 
             //printf("PAD: %d\r\n", padX);
@@ -104,7 +128,8 @@ int main(){
                 motor_set_speed((uint8_t)control_output, MOTOR_DIR_FORWARD);
             } else {
                 motor_set_speed((uint8_t)(-control_output), MOTOR_DIR_REVERSE);
-            }    
+            }   
+            
             
         }
 

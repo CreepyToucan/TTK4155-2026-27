@@ -17,7 +17,6 @@
 #include "MCP2515.h"
 #include "CAN.h"
 
-
 //slave cs pin
 #define IO_board PB1
 #define Oled PB2    
@@ -26,10 +25,7 @@
 
 // CAN IDs
 #define txPack 16
-
-
-volatile uint8_t flag_5ms = 0;
-volatile uint8_t flag_50ms = 0; 
+#define rxPack 17
 
 
 oled_config_t my_oled = {
@@ -60,11 +56,13 @@ const menu_item_t main_items[] = {
 
 menu_t main_menu = { main_items, 4 };
 
-
 int8_t joyX = 0;
 uint8_t padX = 0;
 uint8_t button = 0;
+uint8_t score = 0;
 
+volatile uint8_t flag_5ms = 0;
+volatile uint8_t flag_50ms = 0; 
 
 
 void Timer0_Init(void) {
@@ -136,15 +134,13 @@ int main(void) {
 
     // CAN messages definition //
     can_message_t tx_msg;
-    tx_msg.id = 0x00;         // 11-bit standard ID
+    tx_msg.id = txPack;         // 11-bit standard ID
     tx_msg.length = 3;         // 3 bytes of data
     tx_msg.data[0] = 0x00;
     tx_msg.data[1] = 0x00;
     tx_msg.data[2] = 0x00;
 
-
     can_message_t rx_msg;
-
 
     ///   LOOP  ///
 
@@ -154,8 +150,10 @@ int main(void) {
 
         /// RECEPTION ///
         if(CAN_receive(&rx_msg)){
-            // Process received message
-            printf("Received CAN message with ID: %X\n", rx_msg.id);
+            if(rx_msg.id == rxPack){
+                score = rx_msg.data[0]; // Update score from received CAN message
+                //printf("Score: %d\n", score);
+            }
         }
 
 
@@ -178,6 +176,22 @@ int main(void) {
             CAN_transmit(&tx_msg); 
 
         }
+
+        if(flag_50ms){
+
+            flag_50ms = 0; // Clear the flag immediately
+
+            char string_buffer[20]; 
+            snprintf(string_buffer, sizeof(string_buffer), "%d", score);
+
+            /// DISPLAY ///
+            //oled_clear();
+            oled_pos(0, 0,8);
+            oled_print("Score: ", 8);
+            oled_print(string_buffer, 8);
+
+        }
+
 
     }
     
