@@ -20,8 +20,6 @@
 // CAN Message IDs
 #define rxPack 16
 #define txPack 17
-#define GOAL 20
-
 
 // Set this to the maximum encoder count corresponding to full right travel
 #define ENCODER_MAX_TICKS 2776
@@ -99,11 +97,9 @@ int main(){
                 last_5ms_tick = current_time;
 
                 if(ir_blocked_event()){
-                    score++;
                     //printf("IR blocked! Score: %d\r\n", score);
-                    TXmsg.id = GOAL;
-                    TXmsg.length = 1;
-                    TXmsg.byte[0] = score;
+                    TXmsg.id = txPack;
+                    TXmsg.length = 0;
                     can_tx(TXmsg);
                 }
                
