@@ -92,15 +92,12 @@ int main(){
 
             // Map trackpad input (0..255) to target encoder ticks (0..ENCODER_MAX_TICKS)
             float setpoint_ticks = -1 * ((float)padX / 255.0f) * ENCODER_MAX_TICKS;
-            //printf("Setpoint Ticks: %f\n\r", setpoint_ticks);
 
             // Read current encoder position
-            int32_t current_ticks = encoder_read();
-            //printf("Current Ticks: %d\n\r", current_ticks);
+            int32_t current_ticks = encoder_read(); 
 
             // Compute PI output
             float control_output = pid_update(&pos_pid, setpoint_ticks, (float)current_ticks, SAMPLE_TIME_SEC);
-            //printf("Control Output: %f\n\r", control_output);
 
             // Apply speed and direction to motor driver
             if (control_output >= 0.0f) {

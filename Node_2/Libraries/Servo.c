@@ -14,7 +14,7 @@ uint8_t servoSetPosition(pwm_pin_config_t* config,int8_t val){
     if(val < -100)
         val = -100;
 
-    pulse = (-0.006*val + 1.5) * 1000 + 80;   // todo calibration
+    pulse = (-0.006*val + 1.5) * 1000; 
 
     if((pulse < 900) || (pulse > 2100)){
         return 0;

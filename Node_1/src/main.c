@@ -28,7 +28,6 @@
 #define txPack 16
 
 
-// Volatile variables are required when sharing data between an ISR and the main loop
 volatile uint8_t flag_5ms = 0;
 volatile uint8_t flag_50ms = 0; 
 
@@ -135,9 +134,9 @@ int main(void) {
     CAN_set_mode(CAN_MODE_NORMAL);
 
 
-    // CAN messages definitio //
+    // CAN messages definition //
     can_message_t tx_msg;
-    tx_msg.id = 0x123;         // 11-bit standard ID
+    tx_msg.id = 0x00;         // 11-bit standard ID
     tx_msg.length = 3;         // 3 bytes of data
     tx_msg.data[0] = 0x00;
     tx_msg.data[1] = 0x00;
