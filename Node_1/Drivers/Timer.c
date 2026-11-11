@@ -1,4 +1,5 @@
 #define F_CPU 4915200UL
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
@@ -13,8 +14,9 @@ void timer_init(void) {
 }
 
 ISR(TIMER0_COMP_vect) {
-    // 4.9152 MHz / 64 / 76 gives an interrupt every 0.9896 ms, not 1 ms.
-    // This accumulator skips ~1% of the increments so ms_ticks is exact on average.
+    // 4.9152 MHz / 64 / 76 gives an interrupt every 0.9896 ms (= 760/768 ms), not 1 ms.
+    // Each interrupt adds 760/768 of a millisecond; a tick is counted whenever a whole
+    // millisecond has accumulated, so about 1 interrupt in 96 does not count a tick.
     static uint16_t acc = 0;
     acc += 760;
     if (acc >= 768) {
