@@ -1,6 +1,6 @@
 # TTK4155 - Distributed Embedded Ping-Pong System
 
-An industrial-grade, distributed embedded game system developed for the TTK4155 course (*Industrial and Embedded Computer System Design*) at NTNU. The system implements a real-time, two-node interactive Ping-Pong arcade game featuring closed-loop motor control, IR goal detection, OLED menu navigation, dynamic paddle actuation, and high-speed CAN bus communication.
+An industrial-grade, distributed embedded game system developed for the TTK4155 course (*Embedded and Industrial Computer System Design*) at NTNU. The system implements a real-time, two-node interactive Ping-Pong arcade game featuring closed-loop motor control, IR goal detection, OLED menu navigation, dynamic paddle actuation, and high-speed CAN bus communication.
 
 ## 📌 System Overview
 
@@ -71,23 +71,38 @@ Node 2 executes all real-time closed-loop control and physical hardware interact
 ## 📡 Information & Signal Flow
 
 ```
-[ Human Input ] 
-      │ (Joystick / Buttons)
-      ▼
-[ Node 1: IO Board ] ──(Analog / SPI)──► [ ATmega162 ]
-                                                │
-                                       (SPI to MCP2515)
-                                                ▼
-                                    [ MCP2551 Transceiver ]
-                                                │
-                                   (CAN_H / CAN_L Differential Bus)
-                                                │
-                                    [ MCP2562 Transceiver ]
-                                                ▼
-[ Game Board Hardware ] ◄──(PWM / GPIO)── [ Node 2: ATSAM3X8E ]
-(Motor, Servo, Solenoid)                        │
-      │                                         │
-      └────────────(IR Beam Break ADC)──────────┘
+[Human Input: Joystick/Buttons]
+              |
+              v
++---------------------------------+
+| NODE 1                          |
+| [IO Board]                      |
+|      | (Analog/SPI)             |
+|      v                          |
+| [ATmega162 MCU]                 |
+|      | (SPI)                    |
+|      v                          |
+| [MCP2515 CAN Controller]        |
+|      |                          |
+|      v                          |
+| [MCP2551 CAN Transceiver]       |
++---------------------------------+
+              |
+      (CAN_H/CAN_L Bus)
+              |
+              v
++---------------------------------+
+| NODE 2                          |
+| [MCP2562 CAN Transceiver]       |
+|      | (Native RX/TX)           |
+|      v                          |
+| [ATSAM3X8E MCU]       ^         |
+|      |                |         |
+|  (PWM/GPIO)      (IR Beam ADC)  |
+|      v                |         |
+| [Game Board Hardware]           |
+| (Motor, Servo, Solenoid)        |
++---------------------------------+
 ```
 
 1. **User Action:** Joy-stick movement on the User I/O board updates analog voltages.
