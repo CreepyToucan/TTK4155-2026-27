@@ -2,6 +2,7 @@
 #include "SPI.h"
 #include "fonts.h"
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 
 
 // Internal copy of the configuration to be used by all functions
@@ -89,38 +90,45 @@ void oled_absolute_pos(uint8_t line, uint8_t column) {
     oled_goto_column(column);
 }
 
-void oled_print(const char* str, uint8_t font_size) {
-
-    const uint8_t *selected_font;
-    uint8_t width = check_font_size(font_size);
+// Returns the flash address of the font table for the given size
+static const uint8_t *select_font(uint8_t font_size) {
     switch (font_size) {
-        case 4:
-            selected_font = (const uint8_t *)font4;
-            break;
-        case 8:
-            selected_font = (const uint8_t *)font8;
-            break;
-        default:
-            selected_font = (const uint8_t *)font5;
-            break;
+        case 4:  return (const uint8_t *)font4;
+        case 8:  return (const uint8_t *)font8;
+        default: return (const uint8_t *)font5;
     }
+}
+
+// Draws one character followed by one blank column
+static void oled_put_char(char c, const uint8_t *font, uint8_t width) {
+    if (c < ' ' || c > '~') {
+        c = ' ';
+    }
+    uint16_t offset = (uint16_t)(c - ' ') * width;
+
+    for (uint8_t i = 0; i < width; i++) {
+        oled_write_data(pgm_read_byte(font + offset + i));
+    }
+    oled_write_data(0x00);
+}
+
+void oled_print(const char* str, uint8_t font_size) {
+    const uint8_t *font = select_font(font_size);
+    uint8_t width = check_font_size(font_size);
 
     while (*str) {
+        oled_put_char(*str, font, width);
+        str++;
+    }
+}
 
-        char c = *str;
-        
-        if (c < ' ' || c > '~') {
-            c = ' '; 
-        }
+void oled_print_P(const char* str, uint8_t font_size) {
+    const uint8_t *font = select_font(font_size);
+    uint8_t width = check_font_size(font_size);
+    char c;
 
-        int index = c - ' ';
-
-        for (uint8_t i = 0; i < width; i++) {
-            oled_write_data(pgm_read_byte(selected_font + (index * width) + i));
-            // oled_write_data(pgm_read_byte(selected_font[index][i]));
-        }
-        
-        oled_write_data(0x00);
+    while ((c = (char)pgm_read_byte(str)) != '\0') {
+        oled_put_char(c, font, width);
         str++;
     }
 }
