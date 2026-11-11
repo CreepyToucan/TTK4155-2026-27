@@ -94,7 +94,7 @@ io_slider_t io_getSlider(void);
  * @brief Reads the current position and button state of the joystick.
  * @return io_joystick_t Struct containing X, Y, and button state.
  */
-io_joystick_t io_getJoy(void);
+io_joystick_t io_getJoystick(void);
 
 /**
  * @brief Reads the state of the right, left, and navigation buttons.
