@@ -6,6 +6,12 @@
 /*
     We used Gemini AI here to create the header file with the documentation.
 */
+// Declare the limits of the joystick for calibration
+extern uint8_t min_joy_x, center_joy_x, max_joy_x;
+extern uint8_t min_joy_y, center_joy_y, max_joy_y;
+
+uint8_t getRawJOY_X(void);
+uint8_t getRawJOY_Y(void);
 
 // Enum for selecting the specific joystick or pad axis
 typedef enum {
