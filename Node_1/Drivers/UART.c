@@ -2,8 +2,6 @@
 #include <avr/interrupt.h>
 
 #include "UART.h"
-#include <avr/io.h>
-#include <avr/interrupt.h>
 
 
 // Initialize the UART interface
@@ -12,8 +10,10 @@ void UART_Init(unsigned int ubrr) {
     UBRR0H = (unsigned char)(ubrr >> 8);
     UBRR0L = (unsigned char)ubrr;
     
-    // Enable receiver, transmitter, and receive interrupts
-    UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+    // Enable receiver and transmitter.
+    // The receive interrupt (RXCIE0) must NOT be enabled: there is no ISR(USART0_RXC_vect),
+    // so with sei() active any received byte would jump to the default handler and reset the MCU.
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0);
     
     // Set frame format: 8 data bits, 1 stop bit
     // Note: On the ATmega162, URSEL0 must be written to 1 when writing to UCSR0C
