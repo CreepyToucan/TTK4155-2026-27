@@ -1,6 +1,9 @@
 #include "sam.h"
 #include "pwm.h"
 
+/*
+    Gemini AI helpd us find the correct pin configuration for the Arduino Due PWM pins and their corresponding channels.
+*/
 const pwm_pin_config_t DUE_PIN_6 = { PIOC, PIO_PC24, 1, 7, ID_PIOC }; // PC24, Periph B, Ch 7
 const pwm_pin_config_t DUE_PIN_7 = { PIOC, PIO_PC23, 1, 6, ID_PIOC }; // PC23, Periph B, Ch 6
 const pwm_pin_config_t DUE_PIN_8 = { PIOC, PIO_PC22, 1, 5, ID_PIOC }; // PC22, Periph B, Ch 5
@@ -59,7 +62,5 @@ void pwm_set_duty(const pwm_pin_config_t* config, uint8_t duty_percent) {
 
 // Updates the duty cycle using microseconds for precise servo control
 void pwm_set_pulse_us(const pwm_pin_config_t* config, uint32_t pulse_us) {
-    // Ensure pulse_us is within this range
-    // The base clock is 1 MHz, so 1 tick = 1 microsecond
     PWM->PWM_CH_NUM[config->channel].PWM_CDTYUPD = pulse_us;
 }

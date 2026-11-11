@@ -5,13 +5,11 @@
 #include "../Libraries/encoder.h"
 
 // The ENABLE/PWM pin is connected to Arduino pin D20 / ATSAM3X8E pin PB12
-// PWM out on PB12 uses alternate function B (Peripheral B) on PIOB, PWM channel 0
 const pwm_pin_config_t MOTOR_ENABLE_PIN = { PIOB, PIO_PB12, 1, 0, ID_PIOB };
 
 void motor_init(void) {
     
     // 1. Initialize the ENABLE/PWM pin.
-    // 20 kHz frequency to avoid audible switching noise.
     pwm_init(&MOTOR_ENABLE_PIN, 20000); 
 
     // Initialize the PHASE/DIR pin (Arduino D7 / ATSAM3X8E PC23)
@@ -49,29 +47,31 @@ void motor_stop(void) {
 
 
 
-
+/*
+ We used Gemini AI to help us implement a robust calibration routine.
+*/
 void calibrate_encoder_to_left_stop(void) {
-    // 1. Start moving left (Assuming REVERSE drives the mechanism left)
+    // Start moving left
     motor_set_speed(CALIBRATION_SPEED, MOTOR_DIR_FORWARD);
 
     int32_t last_position = encoder_read();
     uint64_t stall_start_time = time_now(); 
 
-    // 2. Loop until a physical stall is detected
+    // Loop until a physical stall is detected
     while (1) {
-        // Delay before taking the next reading using CPU spin[cite: 1]
-        time_spinFor(msecs(CHECK_INTERVAL_MS)); //[cite: 1]
+        // Delay before taking the next reading using CPU spin
+        time_spinFor(msecs(CHECK_INTERVAL_MS));
         
         int32_t current_position = encoder_read();
         int32_t delta = abs(current_position - last_position);
 
         if (delta > STALL_TOLERANCE_TICKS) {
-            // The motor is still moving; reset the stall timer
-            stall_start_time = time_now(); //[cite: 1]
+            // reset the stall timer
+            stall_start_time = time_now(); 
         } else {
             // The motor hasn't moved significantly
             // Check if it has been stalled long enough to confirm we hit the end
-            if ((time_now() - stall_start_time) >= msecs(STALL_DURATION_MS)) { //[cite: 1]
+            if ((time_now() - stall_start_time) >= msecs(STALL_DURATION_MS)) { 
                 break; // Hard stop confirmed
             }
         }
@@ -79,12 +79,12 @@ void calibrate_encoder_to_left_stop(void) {
         last_position = current_position;
     }
 
-    // 3. Stop the motor
+    // Stop the motor
     motor_stop();
 
-    // 4. Wait a brief moment to allow mechanical vibrations/rebound to settle
+    // Wait a brief moment to allow mechanical vibrations/rebound to settle
     time_spinFor(msecs(200));
 
-    // 5. Reset the hardware encoder counter to 0 at this leftmost position
+    // Reset the hardware encoder counter to 0 at this leftmost position
     encoder_reset();
 }

@@ -10,8 +10,14 @@
  */
 void solenoid_init(void);
 
+/**
+ * @brief Turns on the solenoid for a short duration
+ */
 void solenoid_shoot(void);
 
+/**
+ * @brief Turns off the solenoid
+ */
 void solenoid_rest(void);
 
 #endif // SOLENOID_H

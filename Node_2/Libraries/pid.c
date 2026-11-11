@@ -15,13 +15,13 @@ void pid_reset(PIDController *pid) {
 }
 
 float pid_update(PIDController *pid, float setpoint, float measurement, float dt) {
-    // 1. Calculate error
+    // Calculate error
     float error = setpoint - measurement;
 
-    // 2. Proportional term
+    // Prop  term
     float p_term = pid->Kp * error;
 
-    // 3. Integral term with Anti-Windup clamping
+    // Int term with Anti-Windup clamping
     pid->integral += error * dt;
     float i_term = pid->Ki * pid->integral;
 
@@ -33,13 +33,13 @@ float pid_update(PIDController *pid, float setpoint, float measurement, float dt
         pid->integral = pid->out_min / (pid->Ki > 0.0f ? pid->Ki : 1.0f);
     }
 
-    // 4. Derivative term
+    // Derivative term
     float derivative = (dt > 0.0f) ? (error - pid->prev_error) / dt : 0.0f;
     float d_term = pid->Kd * derivative;
 
     pid->prev_error = error;
 
-    // 5. Total output clamped to limits
+    // Total output clamped to limits
     float output = p_term + i_term + d_term;
     if (output > pid->out_max) output = pid->out_max;
     if (output < pid->out_min) output = pid->out_min;

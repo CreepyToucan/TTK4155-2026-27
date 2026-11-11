@@ -21,7 +21,7 @@ void mcp2515_reset(void) {
     
     spi_select_slave(mcp_cfg.cs_port, mcp_cfg.cs_pin, 0);
     
-    // Wait for the oscillator start-up timer (128 OSC1 clock cycles)
+    // Wait for the oscillator start-up timer
     _delay_ms(10); 
 }
 
@@ -55,7 +55,6 @@ void mcp2515_request_to_send(uint8_t tx_buffers) {
     spi_select_slave(mcp_cfg.cs_port, mcp_cfg.cs_pin, 1);
     
     // The last 3 bits of this command indicate which transmit buffer(s) are enabled to send
-    // Send RTS command byte (0x80 | nnn)
     spi_write_byte(MCP_RTS_BASE | (tx_buffers & 0x07));
     
     spi_select_slave(mcp_cfg.cs_port, mcp_cfg.cs_pin, 0);

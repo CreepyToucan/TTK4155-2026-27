@@ -1,6 +1,10 @@
 #ifndef PID_H
 #define PID_H
 
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
+
 typedef struct {
     // Controller Gains
     float Kp;

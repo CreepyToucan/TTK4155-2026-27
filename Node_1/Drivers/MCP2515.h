@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
+
+
 /**
  * @name MCP2515 SPI Instruction Set
  * Command bytes for the MCP2515 SPI interface.

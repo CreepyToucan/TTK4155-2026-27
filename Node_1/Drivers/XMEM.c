@@ -76,15 +76,12 @@ void SRAM_single_test(void) {
     uint8_t test_value = 0x1A; 
     
     printf("Testing single address 0x1600...\n");
-    
-    // 3. Write the value
+
     *single_address = test_value;
     
-    // 4. Read it back
     uint8_t read_value = *single_address;
     printf("Read value from address 0x1600: %02X\n", read_value);
     
-    // 5. Compare and report
     if (read_value == test_value) {
         printf("SUCCESS: Wrote %02X, Read %02X\n\n", test_value, read_value);
     } else {

@@ -38,12 +38,12 @@ uint8_t ADC_ReadChannel(uint8_t channel) {
     // I bit D2, D1, D0 contain the channel number (0-3)
     uint8_t config_byte = 0b10000000 | channel;
 
-    // Writes the configuration. This generates automatically the WR pulse.
+    // Writes the configuration, this generates automatically the WR pulse.
     ADC_REG = config_byte;
 
     // Wait until the BUSY pin is low (conversion in progress)
     while (!(BUSY_PORT & (1 << BUSY_PIN))) {}
 
-    // Read the result. This generates automatically the RD pulse.
+    // Read the result, this generates automatically the RD pulse.
     return ADC_REG;
 }

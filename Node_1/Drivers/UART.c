@@ -5,6 +5,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+
 // Initialize the UART interface
 void UART_Init(unsigned int ubrr) {
     // Set baud rate
@@ -18,6 +19,9 @@ void UART_Init(unsigned int ubrr) {
     // Note: On the ATmega162, URSEL0 must be written to 1 when writing to UCSR0C
     UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
 
+    /*
+    We asked gemini AI how to Link standard I/O (printf) to our UART transmission wrapper.
+    */
     fdevopen(UART_Transmit_printf, UART_Receive); // Link standard I/O (printf) to our UART transmission wrapper
 }
 

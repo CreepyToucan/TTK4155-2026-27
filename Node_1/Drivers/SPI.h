@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
+
+
 // Initialize the SPI bus as Master
 void spi_init(void);
 

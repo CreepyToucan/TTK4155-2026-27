@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
 
 // Configuration for calibration
 // Adjust speed so the motor pushes against the stop gently without damage

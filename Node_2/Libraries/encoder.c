@@ -38,7 +38,5 @@ int32_t encoder_read(void) {
 }
 
 void encoder_reset(void) {
-    // Instead of fighting the hardware reset requirement for clock edges,
-    // we simply record the stationary position as our new mathematical zero.
     encoder_offset = (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }

@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
+
+
 /**
  * @name I/O Board Command Definitions
  * Command bytes for each operation supported by the I/O board in SPI slave mode.

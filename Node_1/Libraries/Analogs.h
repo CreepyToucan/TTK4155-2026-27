@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+/*
+    We used Gemini AI here to create the header file with the documentation.
+*/
+
 // Enum for selecting the specific joystick or pad axis
 typedef enum {
     Joy_y = 0,

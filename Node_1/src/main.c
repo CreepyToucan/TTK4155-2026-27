@@ -63,6 +63,8 @@ uint8_t score = 0;
 
 volatile uint8_t flag_5ms = 0;
 volatile uint8_t flag_50ms = 0; 
+volatile uint8_t flag_1000ms = 0; 
+
 
 
 void Timer0_Init(void) {
@@ -84,9 +86,11 @@ void Timer0_Init(void) {
 ISR(TIMER0_COMP_vect) {
     static uint8_t count_5ms = 0;
     static uint8_t count_50ms = 0;
-    
+    static uint16_t count_1000ms = 0;
+
     count_5ms++;
     count_50ms++;
+    count_1000ms++;
 
     // Check if 5ms has passed
     if(count_5ms >= 5) {
@@ -98,6 +102,12 @@ ISR(TIMER0_COMP_vect) {
     if(count_50ms >= 50) {
         flag_50ms = 1;
         count_50ms = 0;
+    }
+
+    // Check if 1000ms (1 second) has passed
+    if(count_1000ms >= 1000) {
+        flag_1000ms = 1;
+        count_1000ms = 0;
     }
 }
 
@@ -131,6 +141,8 @@ int main(void) {
     CAN_init(0x09, 0xB1, 0x05); 
     CAN_set_mode(CAN_MODE_NORMAL);
 
+    
+
 
     // CAN messages definition //
     can_message_t tx_msg;
@@ -141,6 +153,7 @@ int main(void) {
     tx_msg.data[2] = 0x00;
 
     can_message_t rx_msg;
+
 
     ///   LOOP  ///
 
@@ -189,6 +202,14 @@ int main(void) {
             oled_pos(0, 0,8);
             oled_print("Score: ", 8);
             oled_print(string_buffer, 8);
+
+        }
+
+        if(flag_1000ms){
+
+            flag_1000ms = 0; // Clear the flag immediately
+            xmem_write(score,0x0000,0x1400 ); // Write the score to external memory at address 0x0000
+            printf("score: %d\n", xmem_read(0x0000,0x1400)); 
 
         }
 
