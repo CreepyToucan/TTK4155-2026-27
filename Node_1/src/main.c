@@ -5,6 +5,7 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <stdio.h>
 #include "UART.h"
 #include "XMEM.h"
@@ -42,20 +43,25 @@ mcp2515_config_t my_mcp2515 = {
     .cs_pin = CAN_MCP2515
 };
 
+// Menu labels are kept in flash to save RAM
+static const char txt_new_game[]    PROGMEM = "New Game";
+static const char txt_settings[]    PROGMEM = "Settings";
+static const char txt_high_scores[] PROGMEM = "High Scores";
+static const char txt_quit[]        PROGMEM = "Quit";
+
 const menu_item_t main_items[] = {
-    {"New Game"},
-    {"Settings"},
-    {"High Scores"},
-    {"Quit"}
+    {txt_new_game},
+    {txt_settings},
+    {txt_high_scores},
+    {txt_quit}
 };
 
-menu_t main_menu = { main_items, 4 };
+const menu_t main_menu = { main_items, 4 };
 
 int main(void) {
-    printf("boot\r\n");
-    
     /// SETUP ///
     UART_Init(MYUBRR);
+
     timer_init();
     sei();
     xmem_init();
