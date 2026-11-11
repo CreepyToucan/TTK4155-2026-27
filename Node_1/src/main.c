@@ -208,8 +208,20 @@ int main(void) {
             printf("score: %d\n", xmem_read(0x0000,0x1400)); 
 
         }
-
-
     }
+
+    // highscores_init();
+
+    // /// LOOP ///
+    // while (1) {
+    //     uint8_t choice = menu_run(&main_menu, 8);
+    //     switch (choice) {
+    //         case 0: start_new_game(); break;
+    //         case 1: show_settings_menu(); break;
+    //         case 2: show_high_scores(); break;
+    //         case 3: oled_funny_graphics(); _delay_ms(2000); break;   // quit
+    //     }
+    // }
+
     return 0;
 }
