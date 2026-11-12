@@ -2,7 +2,7 @@
 #define HIGHSCORES_H
 #include <stdint.h>
 
-#define SRAM_SIZE 30  //SRAM size
+#define SRAM_SIZE 5  //SRAM used size
 #define BASE_ADDRESS_SRAM 0x1400 //SRAM base address
 
 void     highscores_init(void);
