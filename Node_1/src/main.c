@@ -60,8 +60,6 @@ uint8_t score = 0;
 volatile uint8_t flag_5ms = 0;
 volatile uint8_t flag_50ms = 0; 
 volatile uint8_t flag_1000ms = 0; 
-volatile uint16_t seconds = 0; // Counter for seconds
-
 
 
 
@@ -106,72 +104,8 @@ ISR(TIMER0_COMP_vect) {
     if(count_1000ms >= 1000) {
         flag_1000ms = 1;
         count_1000ms = 0;
-        seconds++; // Increment the seconds counter
     }
 }
-
-
-/// GAME FUNCTIONS ///
-
-
-// Waits for the select button to be released, pressed, and released again.
-void wait_for_click(void) {
-    while (io_getButtons().right != 32) {
-        printf("%d\n",io_getButtons().right);
-        _delay_ms(100);
-    }
-}
-
-static void game_countdown(void) {
-    char buf[4];
-    oled_clear();
-    oled_pos(2, 0, 5); oled_print("Get ready!", 5);
-    for (uint8_t n = 3; n > 0; n--) {
-        sprintf(buf, "%d", n);
-        oled_pos(4, 0, 8);
-        oled_print(buf, 8);
-        _delay_ms(1000);
-    }
-}
-
-static void game_draw_lives(uint8_t lives) {
-    char buf[16];
-    sprintf(buf, "Lives: %d", lives);
-    oled_pos(2, 0, 5);
-    oled_print(buf, 5);
-}
-
-static void game_draw_time(uint16_t seconds) {
-    char buf[16];
-    sprintf(buf, "Time: %3us", seconds);   // fixed width, overwrites the old value
-    oled_pos(4, 0, 5);
-    oled_print(buf, 5);
-}
-
-void game_over_screen(uint16_t score, uint8_t rank) {
-    char buf[24];
-    oled_clear();
-    oled_pos(0, 0, 8); oled_print("GAME OVER", 8);
-    sprintf(buf, "Score: %u", score);
-    oled_pos(3, 0, 5); oled_print(buf, 5);
-    if (rank) {
-        oled_pos(4, 0, 5); oled_print("New high score!", 5);
-        sprintf(buf, "Rank: %d", rank);
-        oled_pos(5, 0, 5); oled_print(buf, 5);
-    } else {
-        oled_pos(4, 0, 5); oled_print("Not in the top 5", 5);
-    }
-    oled_pos(7, 0, 5); oled_print("Click to continue", 5);
-}
-
-void initGame_oled(uint8_t lives){
-    oled_clear();
-    oled_pos(0, 0, 5); oled_print("Playing!", 5);
-    oled_pos(7, 0, 5); oled_print("Click to quit", 5);
-    game_draw_lives(lives);
-
-}
-
 
 menu_t main_menu = { main_items, 4 };
 
@@ -218,94 +152,67 @@ int main(void) {
 
     can_message_t rx_msg;
 
+
     ///   LOOP  ///
 
-    while(1){
+    while(1) {
 
-        uint8_t choice = menu_run(&main_menu, 8);
-         switch (choice) {
-             case 0 : break;           
-             case 1: show_settings_menu(); break;
-             case 2: show_high_scores(); break;
-             case 3: oled_funny_graphics(); _delay_ms(2000); break;   // quit
+
+
+        /// RECEPTION ///
+        if(CAN_receive(&rx_msg)){
+            if(rx_msg.id == rxPack){
+                score = rx_msg.data[0]; // Update score from received CAN message
+                //printf("Score: %d\n", score);
             }
-
-            // GAME INIT //
-            uint8_t lives = lives_per_difficulty[difficulty];
-            seconds = 0;
-            initGame_oled(lives);
-            // Drop every old msg that arrived while we weren't listening
-            for (uint8_t i = 0; i < 3; i++) CAN_receive(&rx_msg);
-
-            while((lives > 0)&&(choice == 0)){
-                
-                    /// RECEPTION ///
-                    if(CAN_receive(&rx_msg)){
-                        if(rx_msg.id == rxPack){
-                            lives --;
-                            if(lives == 0) break;
-
-                        }
-                    }
-
-                    if(flag_5ms){
-
-                        flag_5ms = 0; // Clear the flag immediately
-
-                        /// SAMPLING ///
-                        joyX = getPos(Joy_x);
-                        padX = HandlePad_X();
-                        button = getButton();
-                        //printf("Joy X: %d, Pad X: %d, Button: %d\n", joyX, padX, button); //need to remove to keep the 5ms loop fast enough for CAN transmission
-
-                        /// TRANSMISSION ///
-                        tx_msg.id = txPack; 
-                        tx_msg.data[0] = (uint8_t)joyX;
-                        tx_msg.data[1] = padX;
-                        tx_msg.data[2] = button;
-                        CAN_transmit(&tx_msg); 
-
-                    }
-
-                    // OLED  UPDATE //
-                    if(flag_50ms){
-
-                        flag_50ms = 0; // Clear the flag immediately
-                        game_draw_lives(lives);
-                        if (io_getButtons().right == 32) break;
-
-                    }
-                    
-                    // SECONDs UPDATE //
-                    if(flag_1000ms){
-
-                        flag_1000ms = 0; // Clear the flag immediately
-                        game_draw_time(seconds);
-                    }
-                
-            }
+        }
 
 
-            // Game over
-            // Neutral command so the motor and solenoid don't keep acting on the last msg
-            tx_msg.data[0] = 0;
+
+        if(flag_5ms){
+
+            flag_5ms = 0; // Clear the flag immediately
+
+            /// SAMPLING ///
+            joyX = getPos(Joy_x);
+            padX = HandlePad_X();
+            button = getButton();
+            //printf("Joy X: %d, Pad X: %d, Button: %d\n", joyX, padX, button); //need to remove to keep the 5ms loop fast enough for CAN transmission
+
+            /// TRANSMISSION ///
+            tx_msg.id = txPack; 
+            tx_msg.data[0] = (uint8_t)joyX;
             tx_msg.data[1] = padX;
-            tx_msg.data[2] = 0;
-            CAN_transmit(&tx_msg);
+            tx_msg.data[2] = button;
+            CAN_transmit(&tx_msg); 
 
-            uint16_t score = seconds * score_multiplier[difficulty];
-            uint8_t rank = highscores_add(score);
+        }
 
-            game_over_screen(score, rank);
-            wait_for_click();
-        
+        if(flag_50ms){
 
+            flag_50ms = 0; // Clear the flag immediately
+
+            char string_buffer[20]; 
+            snprintf(string_buffer, sizeof(string_buffer), "%d", score);
+
+            /// DISPLAY ///
+            //oled_clear();
+            oled_pos(0, 0,8);
+            oled_print("Score: ", 8);
+            oled_print(string_buffer, 8);
+
+        }
+
+        if(flag_1000ms){
+
+            flag_1000ms = 0; // Clear the flag immediately
+
+            highscores_add(score); // Add the current score to the high scores list every second
+
+            printf("Best Scores: %d, %d, %d\n", highscores_get(0), highscores_get(1), highscores_get(2));
+
+        }
     }
-
-        return 0;
-
-
-}
 
     // highscores_init();
 
@@ -320,4 +227,5 @@ int main(void) {
     //     }
     // }
 
-    
+    return 0;
+}

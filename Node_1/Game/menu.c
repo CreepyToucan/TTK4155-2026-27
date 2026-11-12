@@ -23,12 +23,10 @@
 #define CAL_DURATION_MS     5000
 #define CAL_MIN_SPAN        80     // min raw range per axis for a valid calibration
 
-
-
-uint8_t difficulty = 1;
-const uint8_t lives_per_difficulty[3] = {5, 3, 1};
-const uint8_t score_multiplier[3]     = {1, 2, 3};
-
+// 0 = Easy, 1 = Medium, 2 = Hard
+static uint8_t difficulty = 1;
+static const uint8_t lives_per_difficulty[3] = {5, 3, 1};
+static const uint8_t score_multiplier[3]     = {1, 2, 3};
 
 // Waits for the select button to be released, pressed, and released again.
 static void wait_for_click(void) {
@@ -245,7 +243,7 @@ static void game_over_screen(uint16_t score, uint8_t rank) {
     oled_pos(7, 0, 5); oled_print("Click to continue", 5);
     wait_for_click();
 }
-/*
+
 void start_new_game(void) {
     uint8_t lives = lives_per_difficulty[difficulty];
     uint8_t padX = 0;
@@ -317,4 +315,3 @@ void start_new_game(void) {
 
     game_over_screen(score, rank);
 }
-*/
