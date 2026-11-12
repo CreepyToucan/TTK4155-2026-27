@@ -140,6 +140,7 @@ int main(){
             last_20ms_tick = current_time;
 
             servoSetPosition(&DUE_PIN_21, joyX); 
+            printf("button: %d\n\r", button);
 
             if(button == 1){
                 solenoid_shoot();

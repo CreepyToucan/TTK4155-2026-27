@@ -197,7 +197,7 @@ void show_high_scores(void) {
 
     oled_clear();
     oled_pos(0, 0, 5); oled_print_P(PSTR("HIGH SCORES"), 5);
-    for (uint8_t i = 0; i < HS_COUNT; i++) {
+    for (uint8_t i = 0; i < SRAM_SIZE; i++) {
         sprintf_P(buf, PSTR("%d. %5u"), i + 1, highscores_get(i));
         oled_pos(i + 1, 0, 5);
         oled_print(buf, 5);
