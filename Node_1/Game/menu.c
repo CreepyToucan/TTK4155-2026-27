@@ -1,5 +1,4 @@
 // menu.c
-
 #define F_CPU 4915200UL
 #define BAUD 9600
 #define MYUBRR (F_CPU/16/BAUD-1)
@@ -191,7 +190,7 @@ void show_high_scores(void) {
 
     oled_clear();
     oled_pos(0, 0, 5); oled_print("HIGH SCORES", 5);
-    for (uint8_t i = 0; i < SRAM_SIZE; i++) {
+    for (uint8_t i = 0; i < HS_COUNT; i++) {
         sprintf(buf, "%d. %5u", i + 1, highscores_get(i));
         oled_pos(i + 1, 0, 5);
         oled_print(buf, 5);
@@ -264,7 +263,7 @@ void start_new_game(void) {
     oled_pos(7, 0, 5); oled_print("Click to quit", 5);
     game_draw_lives(lives);
 
-    uint32_t start_ms     = 0//;timer_ms();
+    uint32_t start_ms     = timer_ms();
     uint32_t last_ctrl_ms = start_ms;
     uint32_t last_quit_ms = start_ms;
 

@@ -137,8 +137,6 @@ int main(void) {
     CAN_init(0x09, 0xB1, 0x05);
     CAN_set_mode(CAN_MODE_NORMAL);
 
-    // SCOREBOARD initialization //
-    highscores_init();
     
 
 
@@ -206,10 +204,8 @@ int main(void) {
         if(flag_1000ms){
 
             flag_1000ms = 0; // Clear the flag immediately
-
-            highscores_add(score); // Add the current score to the high scores list every second
-
-            printf("Best Scores: %d, %d, %d\n", highscores_get(0), highscores_get(1), highscores_get(2));
+            xmem_write(score,0x0000,0x1400 ); // Write the score to external memory at address 0x0000
+            printf("score: %d\n", xmem_read(0x0000,0x1400)); 
 
         }
     }
