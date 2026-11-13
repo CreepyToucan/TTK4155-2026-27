@@ -20,6 +20,7 @@ The system is designed around a distributed architecture split across two distin
 The software stack follows a strict hierarchical design pattern, isolating hardware registers behind drivers and providing clean interfaces to high-level application logic.
 
 ![System UML Architecture](TTK4155_UML.svg)
+
 *Figure 2: Complete UML Class Diagram displaying the layered structure of Node 1 and Node 2, functional color coding, and the central CAN bus connection.*
 
 ### Color Legend:
@@ -67,6 +68,36 @@ Node 2 executes all real-time closed-loop control and physical hardware interact
   * `solenoid.c`: Pulses a GPIO pin to trigger a Darlington transistor/relay, driving the electro-mechanical ball pin plunger.
   * `time.c` & `sam_library`: Low-level timing utilities and CMSIS hardware header access (`sam.h`).
 
+
+## 📡 Information & Signal Flow
+
+```
+[ Human Input ] 
+      │ (Joystick / Buttons)
+      ▼
+[ Node 1: IO Board ] ──(Analog / SPI)──► [ ATmega162 ]
+                                                │
+                                       (SPI to MCP2515)
+                                                ▼
+                                    [ MCP2551 Transceiver ]
+                                                │
+                                   (CAN_H / CAN_L Differential Bus)
+                                                │
+                                    [ MCP2562 Transceiver ]
+                                                ▼
+[ Game Board Hardware ] ◄──(PWM / GPIO)── [ Node 2: ATSAM3X8E ]
+(Motor, Servo, Solenoid)                        │
+      │                                         │
+      └────────────(IR Beam Break ADC)──────────┘
+```
+
+1. **User Action:** Joy-stick movement on the User I/O board updates analog voltages.
+2. **Sampling & Dispatch:** Node 1 samples voltages via `ADC.c`, maps direction vectors in `Analogs.c`, packages a CAN frame in `CAN.c`, and transmits it over SPI to `MCP2515.c`.
+3. **Bus Transport:** The differential CAN bus transmits the data packet safely across the physical network cabling.
+4. **Actuation & Response:** Node 2 receives the frame in `can.c`, updates motor velocity via `motor.c` (PID controller), shifts the steering servo angle via `Servo.c`, or fires the solenoid via `solenoid.c`.
+5. **Score Loop:** If the ball crosses the goal line, `ir.c` detects the beam interrupt via `adc.c` and broadcasts a goal message over CAN back to Node 1 to update the OLED game score.
+
+
 ## 🛠️ Build & Flashing Instructions
 
 ### Prerequisites
@@ -95,32 +126,3 @@ make flash   # or bossac --port=ttyACM0 -e -w -v -b build/node2.bin -R
 ## 📜 License & Acknowledgments
 
 Developed as part of **TTK4155 Industrial and Embedded Computer System Design** at the Norwegian University of Science and Technology (NTNU).
-
-## 📡 Information & Signal Flow
-
-```mermaid
-flowchart TD
-    %% Styling
-    classDef human fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
-    classDef hardware fill:#e1f2d5,stroke:#a3c989,stroke-width:2px
-    classDef mcu fill:#f5e8ff,stroke:#ddb0ff,stroke-width:2px
-    classDef comms fill:#e8edff,stroke:#86a0fc,stroke-width:2px
-    
-    User((Human Input)):::human
-    
-    subgraph Node1 ["NODE 1 (ATmega162)"]
-        IO[IO Board]:::hardware
-        MCU1[ATmega162]:::mcu
-        CAN1[MCP2515 Controller\n+\nMCP2551 Transceiver]:::comms
-    end
-    
-    subgraph Node2 ["NODE 2 (ATSAM3X8E)"]
-        CAN2[MCP2562 Transceiver]:::comms
-        MCU2[ATSAM3X8E]:::mcu
-        GameHW[Game Board Hardware\nMotor, Servo, Solenoid]:::hardware
-    end
-    
-    %% Connections
-    User -- "Joystick / Buttons" --> IO
-    IO -- "Analog / SPI" --> MCU1
-    MCU1 -- "SPI" --> CAN1
