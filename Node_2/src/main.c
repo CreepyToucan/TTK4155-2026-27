@@ -22,8 +22,6 @@
 #define txPack 17
 #define GOAL 20
 
-
-// Set this to the maximum encoder count corresponding to full right travel
 #define ENCODER_MAX_TICKS 2776
 #define SAMPLE_TIME_MS    10
 #define SAMPLE_TIME_SEC   (SAMPLE_TIME_MS / 1000.0f)
@@ -76,8 +74,6 @@ int main(){
 
         uint32_t current_time = totalMsecs(time_now());
 
-        //printf("Encoder Position: %ld\r\n", encoder_read());
-
         // Read joystick and trackpad inputs from CAN as fast as possible
         if(can_rx(&RXmsg)){
             joyX = (int8_t)RXmsg.byte[0];
@@ -85,8 +81,6 @@ int main(){
             button = RXmsg.byte[2];
 
         }
-
-        //printf("Joy X: %d, Pad X: %d, Button: %d\r\n", (int8_t)RXmsg.byte[0], RXmsg.byte[1], RXmsg.byte[2]);  //to be reomoved : is fucking up the scheduler
 
 
         if(current_time - last_1ms_tick >= 1) {
@@ -100,7 +94,6 @@ int main(){
 
                 if(ir_blocked_event()){
                     score++;
-                    //printf("IR blocked! Score: %d\r\n", score);
                     TXmsg.id = GOAL;
                     TXmsg.length = 1;
                     TXmsg.byte[0] = score;
@@ -111,8 +104,6 @@ int main(){
 
 
         if (current_time - last_10ms_tick >= 10) {
-
-            //printf("PAD: %d\r\n", padX);
 
             last_10ms_tick = current_time;
 
@@ -140,7 +131,6 @@ int main(){
             last_20ms_tick = current_time;
 
             servoSetPosition(&DUE_PIN_21, joyX); 
-            printf("button: %d\n\r", button);
 
             if(button == 1){
                 solenoid_shoot();
