@@ -59,6 +59,8 @@ const menu_item_t main_items[] = {
 const menu_t main_menu = { main_items, 4 };
 
 int main(void) {
+
+    
     /// SETUP ///
     UART_Init(MYUBRR);
 
