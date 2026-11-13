@@ -19,7 +19,7 @@ The system is designed around a distributed architecture split across two distin
 
 The software stack follows a strict hierarchical design pattern, isolating hardware registers behind drivers and providing clean interfaces to high-level application logic.
 
-![System UML Architecture](TTK4155_UML.svg)
+![System UML Architecture](TTK4155_UML.pdf)
 
 *Figure 2: Complete UML Class Diagram displaying the layered structure of Node 1 and Node 2, functional color coding, and the central CAN bus connection.*
 
